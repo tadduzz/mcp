@@ -154,8 +154,7 @@ def mariadb_create_vector_store(
     """Create a vector store in MariaDB.
 
     Args:
-        vector_store_name: The name of the vector store. Default is "vector_store".
-        embedding_model: The name of the embedding model to use. Default is "openai/text-embedding-3-small".
+        vector_store_name: The name of the vector store to create. Default is "vector_store".
         distance_function: The distance function to use. Options: 'euclidean', 'cosine'. Default is "euclidean".
     """
 
@@ -193,6 +192,25 @@ def mariadb_list_vector_stores(ctx: Context) -> str:
         return f"Error listing vector stores: {e}"
 
     return "Vector stores: " + ", ".join(tables)
+
+
+@mcp.tool()
+def mariadb_delete_vector_store(ctx: Context, vector_store_name: str) -> str:
+    """Delete a vector store in MariaDB.
+
+    Args:
+        vector_store_name: The name of the vector store to delete.
+    """
+    try:
+        conn = ctx.request_context.lifespan_context.conn
+        with conn.cursor() as cursor:
+            cursor.execute(
+                f"DROP TABLE `{DatabaseSettings().database}`.`{vector_store_name}`"
+            )
+    except mariadb.Error as e:
+        return f"Error deleting vector store `{vector_store_name}`: {e}"
+
+    return f"Vector store `{vector_store_name}` deleted successfully."
 
 
 @mcp.tool()
