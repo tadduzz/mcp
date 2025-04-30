@@ -128,6 +128,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         password=DatabaseSettings().password,
         database=DatabaseSettings().database,
     )
+    conn.autocommit = True
     try:
         yield AppContext(conn=conn)
     finally:
