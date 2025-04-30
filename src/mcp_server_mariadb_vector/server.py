@@ -15,7 +15,6 @@ from pydantic_settings import BaseSettings
 
 class EmbeddingProviderType(Enum):
     OPENAI = "openai"
-    # TODO: Add other providers here
     # SENTENCE_TRANSFORMERS = "sentence-transformers"
 
 
@@ -61,7 +60,8 @@ class EmbeddingProvider(ABC):
 class OpenAIEmbeddingProvider(EmbeddingProvider):
     """
     OpenAI implementation of the embedding provider.
-    :param model_name: The name of the OpenAI model to use.
+    Args:
+        model_name: The name of the OpenAI model to use.
     """
 
     def __init__(self, model: str, api_key: str):
@@ -102,8 +102,10 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
 def create_embedding_provider(settings: EmbeddingSettings) -> EmbeddingProvider:
     """
     Create an embedding provider based on the specified type.
-    :param settings: The settings for the embedding provider.
-    :return: An instance of the specified embedding provider.
+    Args:
+        settings: The settings for the embedding provider.
+    Returns:
+        An instance of the specified embedding provider.
     """
     if settings.provider == EmbeddingProviderType.OPENAI:
         return OpenAIEmbeddingProvider(settings.model, settings.openai_api_key)
@@ -159,7 +161,7 @@ def mariadb_create_vector_store(
     embedding_length = embedding_provider.length_of_embedding()
 
     schema_query = f"""
-    CREATE TABLE `{vector_store_name}` (
+    CREATE TABLE `{DatabaseSettings().database}`.`{vector_store_name}` (
         id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         document LONGTEXT NOT NULL,
         embedding VECTOR({embedding_length}) NOT NULL,
@@ -184,7 +186,7 @@ def mariadb_list_vector_stores(ctx: Context) -> str:
     try:
         conn = ctx.request_context.lifespan_context.conn
         with conn.cursor() as cursor:
-            cursor.execute("SHOW TABLES")
+            cursor.execute(f"SHOW TABLES IN {DatabaseSettings().database}")
             tables = [table[0] for table in cursor]
     except mariadb.Error as e:
         return f"Error listing vector stores: {e}"
@@ -213,7 +215,7 @@ def mariadb_insert_documents(
     metadata_json = [json.dumps(metadata) for metadata in metadata]
 
     insert_query = f"""
-    INSERT INTO `{vector_store_name}` (document, embedding, metadata) VALUES (%s, VEC_FromText(%s), %s);
+    INSERT INTO `{DatabaseSettings().database}`.`{vector_store_name}` (document, embedding, metadata) VALUES (%s, VEC_FromText(%s), %s);
     """
     try:
         conn = ctx.request_context.lifespan_context.conn
@@ -246,7 +248,7 @@ def mariadb_vector_search(
         document,
         metadata,
         VEC_DISTANCE_EUCLIDEAN(embedding, VEC_FromText(%s)) AS distance
-    FROM `{vector_store_name}`
+    FROM `{DatabaseSettings().database}`.`{vector_store_name}`
     ORDER BY distance ASC
     LIMIT %s;
     """
