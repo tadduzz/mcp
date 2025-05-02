@@ -1,138 +1,12 @@
 import json
-from abc import ABC, abstractmethod
-from enum import Enum
-from collections.abc import AsyncIterator
-from typing import List, Optional
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from typing import List, Literal, Annotated
 
 import mariadb
-from openai import OpenAI
 from mcp.server.fastmcp import FastMCP, Context
 from pydantic import Field
-from pydantic_settings import BaseSettings
-
-
-class EmbeddingProviderType(Enum):
-    OPENAI = "openai"
-    # SENTENCE_TRANSFORMERS = "sentence-transformers"
-
-
-class DatabaseSettings(BaseSettings):
-    host: str = Field(default="127.0.0.1", validation_alias="MARIADB_HOST")
-    port: int = Field(default=3306, validation_alias="MARIADB_PORT")
-    user: str = Field(validation_alias="MARIADB_USER")
-    password: str = Field(validation_alias="MARIADB_PASSWORD")
-    database: str = Field(default="mcp", validation_alias="MARIADB_DATABASE")
-
-
-class EmbeddingSettings(BaseSettings):
-    provider: EmbeddingProviderType = Field(
-        default=EmbeddingProviderType.OPENAI, validation_alias="EMBEDDING_PROVIDER"
-    )
-    model: str = Field(
-        default="text-embedding-3-small", validation_alias="EMBEDDING_MODEL"
-    )
-    openai_api_key: Optional[str] = Field(
-        default=None, validation_alias="OPENAI_API_KEY"
-    )
-
-
-class EmbeddingProvider(ABC):
-    """Abstract base class for embedding providers."""
-
-    @abstractmethod
-    def embed_documents(self, documents: List[str]) -> List[List[float]]:
-        """Embed a list of documents into vectors."""
-        pass
-
-    @abstractmethod
-    def embed_query(self, query: str) -> List[float]:
-        """Embed a query into a vector."""
-        pass
-
-    @abstractmethod
-    def length_of_embedding(self, model: str) -> int:
-        """Get the length of the embedding for a model."""
-        pass
-
-
-class OpenAIEmbeddingProvider(EmbeddingProvider):
-    """
-    OpenAI implementation of the embedding provider.
-    Args:
-        model_name: The name of the OpenAI model to use.
-    """
-
-    def __init__(self, model: str, api_key: str):
-        self.model = model
-        self.client = OpenAI(api_key=api_key)
-
-    def embed_documents(self, documents: List[str]) -> List[List[float]]:
-        """Embed a list of documents into vectors."""
-        embeddings = [
-            self.client.embeddings.create(
-                model=self.model,
-                input=document,
-            )
-            .data[0]
-            .embedding
-            for document in documents
-        ]
-        return embeddings
-
-    def embed_query(self, query: str) -> List[float]:
-        """Embed a query into a vector."""
-        embedding = self.client.embeddings.create(
-            model=self.model,
-            input=query,
-        )
-        return embedding.data[0].embedding
-
-    def length_of_embedding(self) -> int:
-        """Get the length of the embedding for a model."""
-        if self.model == "text-embedding-3-small":
-            return 1536
-        elif self.model == "text-embedding-3-large":
-            return 3072
-        else:
-            raise ValueError(f"Unknown embedding model: {self.model}")
-
-
-def create_embedding_provider(settings: EmbeddingSettings) -> EmbeddingProvider:
-    """
-    Create an embedding provider based on the specified type.
-    Args:
-        settings: The settings for the embedding provider.
-    Returns:
-        An instance of the specified embedding provider.
-    """
-    if settings.provider == EmbeddingProviderType.OPENAI:
-        return OpenAIEmbeddingProvider(settings.model, settings.openai_api_key)
-
-    else:
-        raise ValueError(f"Unsupported embedding provider: {settings.provider}")
-
-
-@dataclass
-class AppContext:
-    conn: mariadb.Connection
-
-
-@asynccontextmanager
-async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
-    conn = mariadb.connect(
-        host=DatabaseSettings().host,
-        port=DatabaseSettings().port,
-        user=DatabaseSettings().user,
-        password=DatabaseSettings().password,
-        database=DatabaseSettings().database,
-    )
-    conn.autocommit = True
-    try:
-        yield AppContext(conn=conn)
-    finally:
-        conn.close()
+from mcp_server_mariadb_vector.settings import EmbeddingSettings
+from mcp_server_mariadb_vector.embeddings.factory import create_embedding_provider
+from mcp_server_mariadb_vector.app_context import app_lifespan
 
 
 mcp = FastMCP(
@@ -148,26 +22,27 @@ embedding_provider = create_embedding_provider(EmbeddingSettings())
 @mcp.tool()
 def mariadb_create_vector_store(
     ctx: Context,
-    vector_store_name: str = "vector_store",
-    distance_function: str = "euclidean",
+    vector_store_name: Annotated[
+        str,
+        Field(description="The name of the vector store to create"),
+    ],
+    distance_function: Annotated[
+        Literal["euclidean", "cosine"],
+        Field(description="The distance function to use."),
+    ] = "euclidean",
 ) -> str:
-    """Create a vector store in MariaDB.
-
-    Args:
-        vector_store_name: The name of the vector store to create. Default is "vector_store".
-        distance_function: The distance function to use. Options: 'euclidean', 'cosine'. Default is "euclidean".
-    """
+    """Create a vector store in the MariaDB database."""
 
     embedding_length = embedding_provider.length_of_embedding()
 
     schema_query = f"""
-    CREATE TABLE `{DatabaseSettings().database}`.`{vector_store_name}` (
+    CREATE TABLE `{vector_store_name}` (
         id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
         document LONGTEXT NOT NULL,
         embedding VECTOR({embedding_length}) NOT NULL,
         metadata JSON NOT NULL,
         VECTOR INDEX (embedding) DISTANCE={distance_function}
-    );
+    )
     """
 
     try:
@@ -186,7 +61,7 @@ def mariadb_list_vector_stores(ctx: Context) -> str:
     try:
         conn = ctx.request_context.lifespan_context.conn
         with conn.cursor() as cursor:
-            cursor.execute(f"SHOW TABLES IN {DatabaseSettings().database}")
+            cursor.execute("SHOW TABLES")
             tables = [table[0] for table in cursor]
     except mariadb.Error as e:
         return f"Error listing vector stores: {e}"
@@ -195,18 +70,18 @@ def mariadb_list_vector_stores(ctx: Context) -> str:
 
 
 @mcp.tool()
-def mariadb_delete_vector_store(ctx: Context, vector_store_name: str) -> str:
-    """Delete a vector store in MariaDB.
+def mariadb_delete_vector_store(
+    ctx: Context,
+    vector_store_name: Annotated[
+        str, Field(description="The name of the vector store to delete.")
+    ],
+) -> str:
+    """Delete a vector store in the MariaDB database."""
 
-    Args:
-        vector_store_name: The name of the vector store to delete.
-    """
     try:
         conn = ctx.request_context.lifespan_context.conn
         with conn.cursor() as cursor:
-            cursor.execute(
-                f"DROP TABLE `{DatabaseSettings().database}`.`{vector_store_name}`"
-            )
+            cursor.execute(f"DROP TABLE `{vector_store_name}`")
     except mariadb.Error as e:
         return f"Error deleting vector store `{vector_store_name}`: {e}"
 
@@ -216,25 +91,24 @@ def mariadb_delete_vector_store(ctx: Context, vector_store_name: str) -> str:
 @mcp.tool()
 def mariadb_insert_documents(
     ctx: Context,
-    vector_store_name: str = "vector_store",
-    documents: List[str] = [],
-    metadata: List[dict] = [],
+    vector_store_name: Annotated[
+        str, Field(description="The name of the vector store to insert documents into.")
+    ],
+    documents: Annotated[
+        List[str], Field(description="The documents to insert into the vector store.")
+    ],
+    metadata: Annotated[
+        List[dict], Field(description="The metadata of the documents to insert.")
+    ],
 ) -> str:
-    """Insert a document into a vector store.
-
-    Args:
-        vector_store_name: The name of the vector store.
-        documents: The documents to insert.
-        embedding_model: The embedding model to use.
-        metadata: The metadata of the documents.
-    """
+    """Insert a document into a vector store."""
 
     embeddings = embedding_provider.embed_documents(documents)
 
     metadata_json = [json.dumps(metadata) for metadata in metadata]
 
     insert_query = f"""
-    INSERT INTO `{DatabaseSettings().database}`.`{vector_store_name}` (document, embedding, metadata) VALUES (%s, VEC_FromText(%s), %s);
+    INSERT INTO `{vector_store_name}` (document, embedding, metadata) VALUES (%s, VEC_FromText(%s), %s)
     """
     try:
         conn = ctx.request_context.lifespan_context.conn
@@ -250,15 +124,14 @@ def mariadb_insert_documents(
 
 @mcp.tool()
 def mariadb_vector_search(
-    ctx: Context, query: str, vector_store_name: str = "vector_store", k: int = 5
+    ctx: Context,
+    query: Annotated[str, Field(description="The query to search for.")],
+    vector_store_name: Annotated[
+        str, Field(description="The name of the vector store to search.")
+    ],
+    k: Annotated[int, Field(gt=0, description="The number of results to return.")] = 5,
 ) -> str:
-    """Search a vector store for the most similar documents to a query.
-
-    Args:
-        query: The query to search for.
-        vector_store_name: The name of the vector store to search.
-        k: The number of results to return. Default is 5.
-    """
+    """Search a vector store for the most similar documents to a query."""
 
     embedding = embedding_provider.embed_query(query)
 
@@ -267,9 +140,9 @@ def mariadb_vector_search(
         document,
         metadata,
         VEC_DISTANCE_EUCLIDEAN(embedding, VEC_FromText(%s)) AS distance
-    FROM `{DatabaseSettings().database}`.`{vector_store_name}`
+    FROM `{vector_store_name}`
     ORDER BY distance ASC
-    LIMIT %s;
+    LIMIT %s
     """
 
     try:
