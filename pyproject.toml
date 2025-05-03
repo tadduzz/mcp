@@ -9,6 +9,7 @@ dependencies = [
     "mariadb==1.1.12",
     "openai",
     "pydantic",
+    "fastmcp>=2.2.6",
 ]
 
 [project.scripts]

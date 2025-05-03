@@ -1,13 +1,13 @@
 import json
-from typing import List, Literal, Annotated
+from typing import Annotated, List, Literal
 
 import mariadb
-from mcp.server.fastmcp import FastMCP, Context
+from fastmcp import Context, FastMCP
 from pydantic import Field
-from mcp_server_mariadb_vector.settings import EmbeddingSettings
-from mcp_server_mariadb_vector.embeddings.factory import create_embedding_provider
-from mcp_server_mariadb_vector.app_context import app_lifespan
 
+from mcp_server_mariadb_vector.app_context import app_lifespan
+from mcp_server_mariadb_vector.embeddings.factory import create_embedding_provider
+from mcp_server_mariadb_vector.settings import EmbeddingSettings
 
 mcp = FastMCP(
     "Mariadb Vector",

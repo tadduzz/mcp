@@ -17,6 +17,15 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         self.model = model
         self.client = OpenAI(api_key=api_key)
 
+    def length_of_embedding(self) -> int:
+        """Get the length of the embedding for a given model."""
+        if self.model == "text-embedding-3-small":
+            return 1536
+        elif self.model == "text-embedding-3-large":
+            return 3072
+        else:
+            raise ValueError(f"Unknown embedding model: {self.model}")
+
     def embed_documents(self, documents: List[str]) -> List[List[float]]:
         """Embed a list of documents into vectors."""
         embeddings = [
@@ -37,12 +46,3 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
             input=query,
         )
         return embedding.data[0].embedding
-
-    def length_of_embedding(self) -> int:
-        """Get the length of the embedding for a model."""
-        if self.model == "text-embedding-3-small":
-            return 1536
-        elif self.model == "text-embedding-3-large":
-            return 3072
-        else:
-            raise ValueError(f"Unknown embedding model: {self.model}")
