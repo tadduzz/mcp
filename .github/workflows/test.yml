@@ -19,11 +19,6 @@ jobs:
 
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=20s
-          --health-timeout=10s
-          --health-retries=5
 
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +40,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ".python-version"
+          python-version-file: ".python-version"
 
       - name: Enable caching
         uses: astral-sh/setup-uv@v5
