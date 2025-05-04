@@ -56,6 +56,62 @@ def mariadb_create_vector_store(
     return f"Vector store `{vector_store_name}` created successfully."
 
 
+def is_vector_store(conn, table: str, embedding_length: int) -> bool:
+    """
+    True if `table` has the right schema, with vectors of the correct length, and a VECTOR index.
+    """
+
+    with conn.cursor(dictionary=True) as cur:
+        # check columns
+        cur.execute(f"SHOW COLUMNS FROM `{table}`")
+        rows = {r["Field"]: r for r in cur}
+
+        if set(rows) != {"id", "document", "embedding", "metadata"}:
+            return False
+
+        # id
+        id_type = rows["id"]["Type"].lower()
+        if id_type != "bigint(20) unsigned":
+            return False
+        if (
+            rows["id"]["Null"] != "NO"
+            or rows["id"]["Key"] != "PRI"
+            or "auto_increment" not in rows["id"]["Extra"].lower()
+        ):
+            return False
+
+        # document
+        if (
+            rows["document"]["Type"].lower() != "longtext"
+            or rows["document"]["Null"] != "NO"
+        ):
+            return False
+
+        # embedding
+        if (
+            rows["embedding"]["Type"].lower() != f"vector({embedding_length})"
+            or rows["embedding"]["Null"] != "NO"
+        ):
+            return False
+
+        # metadata
+        if (
+            rows["metadata"]["Type"].lower() != "longtext"
+            or rows["metadata"]["Null"] != "NO"
+        ):
+            return False
+
+        # check vector index
+        cur.execute(f"""
+            SHOW INDEX FROM `{table}`
+            WHERE Index_type = 'VECTOR' AND Column_name = 'embedding'
+        """)
+        if cur.fetchone() is None:
+            return False
+
+    return True
+
+
 @mcp.tool()
 def mariadb_list_vector_stores(ctx: Context) -> str:
     """List all vector stores in a MariaDB database."""
@@ -67,7 +123,12 @@ def mariadb_list_vector_stores(ctx: Context) -> str:
     except mariadb.Error as e:
         return f"Error listing vector stores: {e}"
 
-    return "Vector stores: " + ", ".join(tables)
+    embedding_length = embedding_provider.length_of_embedding()
+    vector_stores = [
+        table for table in tables if is_vector_store(conn, table, embedding_length)
+    ]
+
+    return "Vector stores: " + ", ".join(vector_stores)
 
 
 @mcp.tool()
