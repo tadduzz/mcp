@@ -14,8 +14,7 @@ jobs:
       mariadb:
         image: mariadb:11.7
         env:
-          MARIADB_USER: root
-          MARIADB_PASSWORD: Password123!
+          MARIADB_ROOT_PASSWORD: Password123!
           MARIADB_DATABASE: test
 
         ports:
