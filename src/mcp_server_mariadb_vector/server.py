@@ -124,7 +124,7 @@ def mariadb_insert_documents(
 
 
 @mcp.tool()
-def mariadb_vector_search(
+def mariadb_search_vector_store(
     ctx: Context,
     query: Annotated[str, Field(description="The query to search for.")],
     vector_store_name: Annotated[

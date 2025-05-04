@@ -120,7 +120,7 @@ async def test_insert_and_search_documents(
         assert "Documents inserted into `test_store` successfully" in str(result[0])
 
         result = await client.call_tool(
-            "test_mariadb_vector_search",
+            "test_mariadb_search_vector_store",
             {"query": "test document", "vector_store_name": "test_store", "k": 2},
         )
 
