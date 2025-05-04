@@ -1,3 +1,4 @@
+import argparse
 import json
 from typing import Annotated, List, Literal
 
@@ -166,7 +167,29 @@ def mariadb_vector_search(
 
 
 def main():
-    mcp.run(transport="stdio")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--transport",
+        choices=["stdio", "sse"],
+        default="stdio",
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+    )
+
+    args = parser.parse_args()
+
+    if args.transport == "sse":
+        mcp.run(transport=args.transport, host=args.host, port=args.port)
+    else:
+        mcp.run(transport=args.transport)
 
 
 if __name__ == "__main__":
