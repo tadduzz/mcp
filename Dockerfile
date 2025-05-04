@@ -37,4 +37,4 @@ RUN uv sync
 
 EXPOSE 8000
 
-CMD ["uv", "run", "mcp-server-mariadb-vector", "--host", "0.0.0.0", "--transport", "sse"]
+CMD ["uv", "run", "mcp-server-mariadb-vector", "--transport", "sse", "--host", "0.0.0.0"]
