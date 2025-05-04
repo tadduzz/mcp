@@ -60,9 +60,10 @@ jobs:
         run: |
           uv run pytest tests/test_server.py -v
         env:
-          # Environment variables for database
+          # Environment variables for MCP server
           MARIADB_HOST: 127.0.0.1
           MARIADB_PORT: 3306
           MARIADB_USER: root
           MARIADB_PASSWORD: Password123!
           MARIADB_DATABASE: test
+          EMBEDDING_PROVIDER: test

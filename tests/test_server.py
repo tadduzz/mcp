@@ -7,25 +7,6 @@ from mcp_server_mariadb_vector.app_context import app_lifespan
 from mcp_server_mariadb_vector.settings import DatabaseSettings
 
 
-class MockEmbeddingProvider:
-    def __init__(self):
-        self.embed_documents_called = 0
-        self.embed_query_called = 0
-
-    def length_of_embedding(self):
-        return 3
-
-    def embed_documents(self, documents):
-        self.embed_documents_called += 1
-        print(f"Mock embed_documents called with {len(documents)} documents")
-        return [[1.0, 0.0, 0.0] for _ in documents]
-
-    def embed_query(self, query):
-        self.embed_query_called += 1
-        print(f"Mock embed_query called with query: '{query}'")
-        return [1.0, 0.0, 0.0]
-
-
 @pytest.fixture
 def db_settings():
     return DatabaseSettings()
@@ -64,15 +45,8 @@ def clean_database(db_connection):
 
 
 @pytest.fixture
-def mock_embedding_provider():
-    return MockEmbeddingProvider()
-
-
-@pytest.fixture
-async def mcp_test_server(mock_embedding_provider):
+async def mcp_test_server():
     """Set up MCP server with mocked embedding provider and regular app lifespan."""
-
-    server.embedding_provider = mock_embedding_provider
 
     test_server = FastMCP("TestServer", lifespan=app_lifespan)
 
@@ -124,7 +98,7 @@ async def test_list_vector_stores(mcp_test_server, clean_database, db_connection
 
 
 async def test_insert_and_search_documents(
-    mcp_test_server, clean_database, db_connection, mock_embedding_provider
+    mcp_test_server, clean_database, db_connection
 ):
     documents = ["This is a test document", "This is another test document"]
     metadata = [{"type": "test1"}, {"type": "test2"}]
@@ -144,9 +118,6 @@ async def test_insert_and_search_documents(
             },
         )
         assert "Documents inserted into `test_store` successfully" in str(result[0])
-        assert mock_embedding_provider.embed_documents_called > 0, (
-            "Mock embed_documents was not called"
-        )
 
         result = await client.call_tool(
             "test_mariadb_vector_search",
@@ -157,6 +128,3 @@ async def test_insert_and_search_documents(
         assert "This is another test document" in str(result[0])
         assert "'type': 'test1'" in str(result[0])
         assert "'type': 'test2'" in str(result[0])
-        assert mock_embedding_provider.embed_query_called > 0, (
-            "Mock embed_query was not called"
-        )

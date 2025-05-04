@@ -5,6 +5,7 @@ from typing import List
 
 class EmbeddingProviderType(Enum):
     OPENAI = "openai"
+    TEST = "test"
     # SENTENCE_TRANSFORMERS = "sentence-transformers"
 
 
