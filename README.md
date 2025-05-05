@@ -1,6 +1,6 @@
 # mcp-server-mariadb-vector
 
-The MariaDB Vector MCP server provides tools that LLM agents can use to interact with a MariaDB Vector database, providing users with a natural language interface to store and interact with their data. Thanks to the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction), this server is compatible with any MCP client, including those provided by applications like Claude Desktop and Cursor/Windsurf, as well as LLM Agent frameworks like LangGraph and PydanticAI.
+The MariaDB Vector MCP server provides tools that LLM agents can use to interact with MariaDB database [with vector support](https://mariadb.org/projects/mariadb-vector/), providing users with a natural language interface to store and interact with their data. Thanks to the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction), this server is compatible with any MCP client, including those provided by applications like Claude Desktop and Cursor/Windsurf, as well as LLM Agent frameworks like LangGraph and PydanticAI.
 
 Using the MariaDB Vector MCP server, users can for example:
 
@@ -33,13 +33,19 @@ Using the MariaDB Vector MCP server, users can for example:
 
 ## Setup
 
+> **Note:** From here on, it is assumed that you have a running MariaDB instance with vector support (version **11.7** or higher). If you don't have one, you can quickly spin up a MariaDB instance using Docker:
+>
+> ```bash
+> docker run -p 3306:3306 --name mariadb-instance -e MARIADB_ROOT_PASSWORD=password -e MARIADB_DATABASE=database_name mariadb:11.7
+> ```
+
 First clone the repository:
 
 ```bash
 git clone https://github.com/DavidRamosSal/mcp-server-mariadb-vector.git
 ```
 
-There are two ways to run the MariaDB Vector MCP server: as a Python package using uv or as a Docker container building it from the Dockerfile.
+There are two ways to run the MariaDB Vector MCP server: as a Python package using **uv** or as a **Docker container** built from the provided Dockerfile.
 
 ### Requirements for running the server using uv
 
@@ -60,10 +66,10 @@ The server needs to be configured with the following environment variables:
 | `MARIADB_PORT`       | port of the running MariaDB database     | `3306`                   |
 | `MARIADB_USER`       | user of the running MariaDB database     | None                     |
 | `MARIADB_PASSWORD`   | password of the running MariaDB database | None                     |
-| `MARIADB_DATABASE`   | name of the running MariaDB database     | `mcp`                    |
+| `MARIADB_DATABASE`   | name of the running MariaDB database     | None                     |
 | `EMBEDDING_PROVIDER` | provider of the embedding models         | `openai`                 |
 | `EMBEDDING_MODEL`    | model of the embedding provider          | `text-embedding-3-small` |
-| `OPENAI_API_KEY`     | API key for OpenAI's embedding models    | None                     |
+| `OPENAI_API_KEY`     | API key for OpenAI's platform            | None                     |
 
 ### Running the server using uv
 
@@ -83,7 +89,7 @@ Build the Docker container from the root directory of the cloned repository by r
 docker build -t mcp-server-mariadb-vector .
 ```
 
-Then run the container:
+Then run the container (replace with your own configuration):
 
 ```bash
 docker run -p 8000:8000 \
@@ -99,7 +105,7 @@ docker run -p 8000:8000 \
   mcp-server-mariadb-vector
 ```
 
-The server will be available at `http://localhost:8000/sse`, using the SSE transport protocol. Make sure to leave `MARIADB_HOST` set to `host.docker.internal` if you are running the MariaDB database as a Docker container on your host machine.
+The server will be available at `http://localhost:8000/sse`, using the SSE transport protocol. **Make sure** to leave `MARIADB_HOST` set to `host.docker.internal` if you are running the MariaDB database as a Docker container on your host machine.
 
 ### Integration with Claude Desktop | Cursor | Windsurf
 
@@ -123,12 +129,12 @@ Claude Desktop, Cursor and Windsurf can run and connect to the server automatica
 }
 ```
 
-Alternatively, Cursor and Windsurf can connect to the an already running server on your host machine (e.g. if you are running the server as a Docker container) using SSE transport. To do so, add the following to the corresponding configuration file:
+Alternatively, Cursor and Windsurf can connect to an already running server on your host machine (e.g. if you are running the server as a Docker container) using SSE transport. To do so, add the following to the corresponding configuration file:
 
 ```json
   "mcpServers": {
     "mariadb-vector": {
-      "url": "http://127.0.0.1:8000/sse"
+      "url": "http://localhost:8000/sse"
     }
   }
 }
