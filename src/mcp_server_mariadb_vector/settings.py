@@ -11,7 +11,7 @@ class DatabaseSettings(BaseSettings):
     port: int = Field(default=3306, alias="MARIADB_PORT")
     user: str = Field(..., alias="MARIADB_USER")
     password: str = Field(..., alias="MARIADB_PASSWORD")
-    database: str = Field(default="mcp", alias="MARIADB_DATABASE")
+    database: str = Field(..., alias="MARIADB_DATABASE")
 
 
 class EmbeddingSettings(BaseSettings):
