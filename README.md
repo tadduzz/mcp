@@ -23,7 +23,7 @@ This server provides the following tools for interacting with MariaDB:
     *   **Parameters:** `database_name` (string, required), `table_name` (string, required).
 *   **`execute_sql`**:
     *   **Functionality:** Executes a read-only SQL query (e.g., `SELECT`, `SHOW`, `DESCRIBE`) against a specified database. Supports parameterized queries (`%s` placeholders) for safety. If `MCP_READ_ONLY` is enabled in the configuration, it attempts to prevent non-read-only commands.
-    *   **Parameters:** `sql_query` (string, required), `database_name` (string, optional), `parameters` (list, optional - values corresponding to `%s` placeholders).
+    *   **Parameters:** `sql_query` (string, required), `database_name` (string, required), `parameters` (list, optional - values corresponding to `%s` placeholders).
 
 ## Setup
 
