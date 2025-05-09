@@ -1,4 +1,3 @@
-# server.py
 import asyncio
 import logging
 import argparse
@@ -6,7 +5,7 @@ from typing import List, Dict, Any, Optional
 from functools import partial # Needed for anyio.run
 
 import asyncmy
-import anyio # Import anyio for the main run call
+import anyio
 from fastmcp import FastMCP, Context
 
 # Import configuration settings
@@ -23,7 +22,7 @@ class MariaDBServer:
     MCP Server exposing tools to interact with a MariaDB database.
     Manages the database connection pool.
     """
-    def __init__(self, server_name="MariaDB_Ops_Server"):
+    def __init__(self, server_name="MariaDB_Server"):
         self.mcp = FastMCP(server_name)
         self.pool: Optional[asyncmy.Pool] = None
         self.is_read_only = MCP_READ_ONLY
@@ -117,16 +116,13 @@ class MariaDBServer:
         except AsyncMyError as e:
             conn_state = f"Connection: {'acquired' if conn else 'not acquired'}"
             logger.error(f"Database error executing query ({conn_state}): {e}", exc_info=True)
-            # Check for specific connection-related errors if possible
             raise RuntimeError(f"Database error: {e}") from e
         except PermissionError as e:
              logger.warning(f"Permission denied: {e}")
              raise e
         except Exception as e:
-            # Catch potential loop closed errors here too, although ideally fixed by structure change
             if isinstance(e, RuntimeError) and 'Event loop is closed' in str(e):
                  logger.critical("Detected closed event loop during query execution!", exc_info=True)
-                 # This indicates a fundamental problem with loop management still exists
                  raise RuntimeError("Event loop closed unexpectedly during query.") from e
             conn_state = f"Connection: {'acquired' if conn else 'not acquired'}"
             logger.error(f"Unexpected error during query execution ({conn_state}): {e}", exc_info=True)
@@ -163,7 +159,6 @@ class MariaDBServer:
     
     
     # --- MCP Tool Definitions ---
-    # Methods remain the same (without decorators)
 
     async def list_databases(self) -> List[str]:
         """Lists all accessible databases on the connected MariaDB server."""
@@ -267,20 +262,15 @@ class MariaDBServer:
             logger.error(f"Invalid database_name for creation: '{database_name}'. Must be a valid identifier.")
             raise ValueError(f"Invalid database_name for creation: '{database_name}'. Must be a valid identifier.")
 
-        # Check existence first to provide a clear message, though CREATE DATABASE IF NOT EXISTS is idempotent
         if await self._database_exists(database_name):
             message = f"Database '{database_name}' already exists."
             logger.info(f"TOOL END: create_database. {message}")
             return {"status": "exists", "message": message, "database_name": database_name}
 
         sql = f"CREATE DATABASE IF NOT EXISTS `{database_name}`;"
-        # Added default character set and collation, which is good practice.
 
         try:
-            # Execute CREATE DATABASE.
-            # Provide a context like 'information_schema' or None if _execute_query handles no specific DB for such commands.
             await self._execute_query(sql, database=None)
-
             message = f"Database '{database_name}' created successfully."
             logger.info(f"TOOL END: create_database. {message}")
             return {"status": "success", "message": message, "database_name": database_name}
@@ -292,14 +282,13 @@ class MariaDBServer:
     async def create_vector_store(self,
                                   database_name: str,
                                   vector_store_name: str,
-                                  embedding_length: int, # Assuming this is still required for DDL
+                                  embedding_length: int,
                                   distance_function: Optional[str] = None) -> Dict[str, Any]:
         """
         THIS TOOL HELPS IN CREATING A TABLE WHICH STORES EMBEDDINGS. 
         
         Creates a new vector store (table) with a predefined schema if it doesn't already exist.
-        It first checks if the database exists, creating it if necessary.
-        Then, it checks if the table exists; if so, it reports that.
+        First checks if the database exists, creating it if necessary.
         Otherwise, it creates the table with id, document, embedding (VECTOR type), and metadata (JSON) columns.
         A VECTOR INDEX is created on the embedding column.
 
@@ -345,8 +334,6 @@ class MariaDBServer:
             try:
                 await self.create_database(database_name) # Call the create_database tool/method
             except Exception as db_create_e:
-                # If create_database itself raises an error, it will propagate.
-                # This catch is for any other unexpected issue if create_database doesn't raise but fails.
                 logger.error(f"Failed to ensure database '{database_name}' existence: {db_create_e}", exc_info=True)
                 raise RuntimeError(f"Failed to ensure database '{database_name}' exists before creating vector store. Reason: {str(db_create_e)}")
 
@@ -364,14 +351,13 @@ class MariaDBServer:
         # --- SQL Query for Vector Store Table Creation ---
         schema_query = f"""
         CREATE TABLE IF NOT EXISTS `{vector_store_name}` (
-            id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-            document LONGTEXT NOT NULL,
+            id VARCHAR(36) NOT NULL DEFAULT UUID_v7() PRIMARY KEY,
+            document TEXT NOT NULL,
             embedding VECTOR({embedding_length}) NOT NULL,
             metadata JSON NOT NULL,
             VECTOR INDEX (embedding) DISTANCE={processed_distance_function_sql}
         );
         """
-
         try:
             # --- Execute Query ---
             await self._execute_query(schema_query, database=database_name)
@@ -436,10 +422,7 @@ class MariaDBServer:
         """
 
         try:
-            # Execute the query against the information_schema,
-            # and the TABLE_SCHEMA in the WHERE clause targets the specific database.
             results = await self._execute_query(sql_query, params=(database_name,), database='information_schema')
-            
             store_list = [row['TABLE_NAME'] for row in results if 'TABLE_NAME' in row]
             
             if not store_list:
@@ -455,23 +438,9 @@ class MariaDBServer:
             logger.error(f"TOOL ERROR: list_vector_stores. {error_message} Error: {e}", exc_info=True)
             raise RuntimeError(f"{error_message} Reason: {str(e)}") 
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
     # --- Tool Registration (Synchronous) ---
     def register_tools(self):
-        """Registers the class methods as MCP tools using the instance. This is synchronous."""
+        """Registers the class methods as MCP tools."""
         if self.pool is None:
              logger.error("Cannot register tools: Database pool is not initialized.")
              raise RuntimeError("Database pool must be initialized before registering tools.")
@@ -510,7 +479,6 @@ class MariaDBServer:
                  return # Exit if transport is invalid
 
             # 4. Run the appropriate async listener from FastMCP
-            # We call the internal run_async method which expects to be run by anyio
             await self.mcp.run_async(transport=transport, **transport_kwargs)
 
         except (ConnectionError, AsyncMyError, RuntimeError) as e:
@@ -550,9 +518,7 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
          logger.info("Server execution interrupted by user.")
-         # Pool closure is handled in run_async_server's finally block
     except Exception as e:
-         # Catch errors raised from run_async_server (including setup errors)
          logger.critical(f"Server failed to start or crashed: {e}", exc_info=True)
          exit_code = 1 # Indicate failure
     finally:
