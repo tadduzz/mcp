@@ -1,0 +1,628 @@
+2025-05-08 12:26:07,373 - config - INFO - Read-only mode: True
+2025-05-08 12:26:07,373 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 12:26:07,385 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 12:26:07,385 - config - WARNING - Server running in READ-ONLY mode. Write operations are disabled.
+2025-05-08 12:26:07,397 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 12:26:07,415 - config - INFO - Connection pool initialized successfully.
+2025-05-08 12:26:07,419 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 12:26:07,420 - config - INFO - Starting MCP server via stdio...
+2025-05-08 12:26:07,431 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 12:33:07,198 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 12:33:07,199 - config - INFO - TOOL START: list_databases called.
+2025-05-08 12:33:07,200 - config - INFO - Executing query (DB: Chinook): SHOW DATABASES...
+2025-05-08 12:33:07,233 - config - INFO - Query executed successfully, 8 rows returned.
+2025-05-08 12:33:07,243 - config - INFO - TOOL END: list_databases completed. Databases found: 8.
+2025-05-08 12:33:55,591 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 12:33:55,625 - config - INFO - TOOL START: list_tables called. database_name=chinook
+2025-05-08 12:33:55,626 - config - INFO - Executing query (DB: chinook): SHOW TABLES...
+2025-05-08 12:33:55,628 - config - INFO - Query executed successfully, 12 rows returned.
+2025-05-08 12:33:55,628 - config - INFO - TOOL END: list_tables completed. Tables found: 12.
+2025-05-08 12:35:47,956 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 12:35:47,959 - config - INFO - TOOL START: get_table_schema called. database_name=chinook, table_name=invoice
+2025-05-08 12:35:47,960 - config - INFO - Executing query (DB: Chinook): DESCRIBE `chinook`.`invoice`...
+2025-05-08 12:35:47,983 - config - INFO - Query executed successfully, 9 rows returned.
+2025-05-08 12:35:47,983 - config - INFO - TOOL END: get_table_schema completed. Columns found: 9. Keys: ['InvoiceId', 'CustomerId', 'InvoiceDate', 'BillingAddress', 'BillingCity', 'BillingState', 'BillingCountry', 'BillingPostalCode', 'Total']
+2025-05-08 12:37:17,471 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 12:37:17,471 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=SELECT * FROM invoice LIMIT 5;, parameters=None
+2025-05-08 12:37:17,472 - config - INFO - Executing query (DB: chinook): SELECT * FROM invoice LIMIT 5;...
+2025-05-08 12:37:17,521 - config - INFO - Query executed successfully, 5 rows returned.
+2025-05-08 12:37:17,522 - config - INFO - TOOL END: execute_sql completed. Rows returned: 5.
+2025-05-08 12:41:00,914 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 12:41:00,914 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=CREATE TABLE Orders (
+    Order_Id INT PRIMARY KEY,
+    Order_Items VARCHAR(255),
+    Order_Qty INT,, parameters=None
+2025-05-08 12:41:00,915 - config - WARNING - Blocked potentially non-read-only query in read-only mode: CREATE TABLE Orders (
+    Order_Id INT PRIMARY KEY,
+    Order_Items VARCHAR(255),
+    Order_Qty INT,...
+2025-05-08 12:41:00,915 - config - ERROR - TOOL ERROR: execute_sql failed for database_name=chinook, sql_query=CREATE TABLE Orders (
+    Order_Id INT PRIMARY KEY,
+    Order_Items VARCHAR(255),
+    Order_Qty INT,, parameters=None: Operation forbidden: Server is in read-only mode.
+Traceback (most recent call last):
+  File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 227, in execute_sql
+    results = await self._execute_query(sql_query, params=param_tuple, database=database_name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 92, in _execute_query
+    raise PermissionError("Operation forbidden: Server is in read-only mode.")
+PermissionError: Operation forbidden: Server is in read-only mode.
+2025-05-08 13:25:39,724 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 13:25:39,724 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=CREATE TABLE Orders (
+  Order_Id INT PRIMARY KEY,
+  Order_Items VARCHAR(255),
+  Order_Qty INT,
+  Ord, parameters=None
+2025-05-08 13:25:39,724 - config - WARNING - Blocked potentially non-read-only query in read-only mode: CREATE TABLE Orders (
+  Order_Id INT PRIMARY KEY,
+  Order_Items VARCHAR(255),
+  Order_Qty INT,
+  Ord...
+2025-05-08 13:25:39,724 - config - ERROR - TOOL ERROR: execute_sql failed for database_name=chinook, sql_query=CREATE TABLE Orders (
+  Order_Id INT PRIMARY KEY,
+  Order_Items VARCHAR(255),
+  Order_Qty INT,
+  Ord, parameters=None: Operation forbidden: Server is in read-only mode.
+Traceback (most recent call last):
+  File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 227, in execute_sql
+    results = await self._execute_query(sql_query, params=param_tuple, database=database_name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 92, in _execute_query
+    raise PermissionError("Operation forbidden: Server is in read-only mode.")
+PermissionError: Operation forbidden: Server is in read-only mode.
+2025-05-08 13:25:39,734 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 13:25:39,734 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=CREATE TABLE Orders (
+    Order_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Order_Items TEXT NULL,
+    Or, parameters=None
+2025-05-08 13:25:39,735 - config - WARNING - Blocked potentially non-read-only query in read-only mode: CREATE TABLE Orders (
+    Order_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Order_Items TEXT NULL,
+    Or...
+2025-05-08 13:25:39,735 - config - ERROR - TOOL ERROR: execute_sql failed for database_name=chinook, sql_query=CREATE TABLE Orders (
+    Order_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Order_Items TEXT NULL,
+    Or, parameters=None: Operation forbidden: Server is in read-only mode.
+Traceback (most recent call last):
+  File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 227, in execute_sql
+    results = await self._execute_query(sql_query, params=param_tuple, database=database_name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 92, in _execute_query
+    raise PermissionError("Operation forbidden: Server is in read-only mode.")
+PermissionError: Operation forbidden: Server is in read-only mode.
+2025-05-08 13:25:39,737 - config - CRITICAL - Server execution failed with an unexpected error: unhandled errors in a TaskGroup (2 sub-exceptions)
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 273, in run_async_server
+  |     await self.mcp.run_async(transport=transport, **transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 283, in run_async
+  |     await self.run_stdio_async(**transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 811, in run_stdio_async
+  |     async with stdio_server() as (read_stream, write_stream):
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(typ, value, traceback)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 83, in stdio_server
+  |     async with anyio.create_task_group() as tg:
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (2 sub-exceptions)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 79, in stdout_writer
+    |     await stdout.flush()
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_core\_fileio.py", line 140, in flush
+    |     return await to_thread.run_sync(self._fp.flush)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\to_thread.py", line 56, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2470, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 967, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    | OSError: [Errno 22] Invalid argument
+    +---------------- 2 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 86, in stdio_server
+    |     yield read_stream, write_stream
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 812, in run_stdio_async
+    |     await self._mcp_server.run(
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 483, in run
+    |     async with AsyncExitStack() as stack:
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 745, in __aexit__
+    |     raise exc_details[1]
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 728, in __aexit__
+    |     cb_suppress = await cb(*exc_details)
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 209, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Exception Group Traceback (most recent call last):
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 489, in run
+      |     async with anyio.create_task_group() as tg:
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+      |     raise BaseExceptionGroup(
+      | ExceptionGroup: unhandled errors in a TaskGroup (2 sub-exceptions)
+      +-+---------------- 1 ----------------
+        | Traceback (most recent call last):
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 517, in _handle_message
+        |     await self._handle_request(
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 563, in _handle_request
+        |     await message.respond(response)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 122, in respond
+        |     await self._session._send_response(  # type: ignore[reportPrivateUsage]
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 303, in _send_response
+        |     await self._write_stream.send(JSONRPCMessage(jsonrpc_response))
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 255, in send
+        |     raise BrokenResourceError from None
+        | anyio.BrokenResourceError
+        +---------------- 2 ----------------
+        | Traceback (most recent call last):
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 517, in _handle_message
+        |     await self._handle_request(
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 563, in _handle_request
+        |     await message.respond(response)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 122, in respond
+        |     await self._session._send_response(  # type: ignore[reportPrivateUsage]
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 303, in _send_response
+        |     await self._write_stream.send(JSONRPCMessage(jsonrpc_response))
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 255, in send
+        |     raise BrokenResourceError from None
+        | anyio.BrokenResourceError
+        +------------------------------------
+2025-05-08 13:25:39,894 - config - INFO - Closing database connection pool...
+2025-05-08 13:25:39,894 - config - INFO - Database connection pool closed.
+2025-05-08 13:25:39,903 - config - CRITICAL - Server failed to start or crashed: unhandled errors in a TaskGroup (2 sub-exceptions)
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 305, in <module>
+  |     anyio.run(
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_core\_eventloop.py", line 74, in run
+  |     return async_backend.run(func, args, {}, backend_options)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2310, in run
+  |     return runner.run(wrapper())
+  |            ^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\asyncio\runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\asyncio\base_events.py", line 653, in run_until_complete
+  |     return future.result()
+  |            ^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2298, in wrapper
+  |     return await func(*args)
+  |            ^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 273, in run_async_server
+  |     await self.mcp.run_async(transport=transport, **transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 283, in run_async
+  |     await self.run_stdio_async(**transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 811, in run_stdio_async
+  |     async with stdio_server() as (read_stream, write_stream):
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(typ, value, traceback)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 83, in stdio_server
+  |     async with anyio.create_task_group() as tg:
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (2 sub-exceptions)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 79, in stdout_writer
+    |     await stdout.flush()
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_core\_fileio.py", line 140, in flush
+    |     return await to_thread.run_sync(self._fp.flush)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\to_thread.py", line 56, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2470, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 967, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    | OSError: [Errno 22] Invalid argument
+    +---------------- 2 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 86, in stdio_server
+    |     yield read_stream, write_stream
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 812, in run_stdio_async
+    |     await self._mcp_server.run(
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 483, in run
+    |     async with AsyncExitStack() as stack:
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 745, in __aexit__
+    |     raise exc_details[1]
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 728, in __aexit__
+    |     cb_suppress = await cb(*exc_details)
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 209, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Exception Group Traceback (most recent call last):
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 489, in run
+      |     async with anyio.create_task_group() as tg:
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+      |     raise BaseExceptionGroup(
+      | ExceptionGroup: unhandled errors in a TaskGroup (2 sub-exceptions)
+      +-+---------------- 1 ----------------
+        | Traceback (most recent call last):
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 517, in _handle_message
+        |     await self._handle_request(
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 563, in _handle_request
+        |     await message.respond(response)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 122, in respond
+        |     await self._session._send_response(  # type: ignore[reportPrivateUsage]
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 303, in _send_response
+        |     await self._write_stream.send(JSONRPCMessage(jsonrpc_response))
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 255, in send
+        |     raise BrokenResourceError from None
+        | anyio.BrokenResourceError
+        +---------------- 2 ----------------
+        | Traceback (most recent call last):
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 517, in _handle_message
+        |     await self._handle_request(
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 563, in _handle_request
+        |     await message.respond(response)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 122, in respond
+        |     await self._session._send_response(  # type: ignore[reportPrivateUsage]
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 303, in _send_response
+        |     await self._write_stream.send(JSONRPCMessage(jsonrpc_response))
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 255, in send
+        |     raise BrokenResourceError from None
+        | anyio.BrokenResourceError
+        +------------------------------------
+2025-05-08 13:25:39,939 - config - INFO - Server exiting with code 1.
+2025-05-08 15:59:02,183 - config - INFO - Read-only mode: False
+2025-05-08 15:59:02,183 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 15:59:02,192 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 15:59:02,201 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 15:59:02,215 - config - INFO - Connection pool initialized successfully.
+2025-05-08 15:59:02,219 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 15:59:02,219 - config - INFO - Starting MCP server via stdio...
+2025-05-08 15:59:02,242 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 15:59:02,242 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 15:59:02,248 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 15:59:02,264 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 16:00:37,919 - config - INFO - Read-only mode: False
+2025-05-08 16:00:37,919 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 16:00:37,933 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 16:00:37,948 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 16:00:37,968 - config - INFO - Connection pool initialized successfully.
+2025-05-08 16:00:37,971 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 16:00:37,972 - config - INFO - Starting MCP server via stdio...
+2025-05-08 16:00:38,208 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 16:00:38,212 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 16:00:38,218 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 16:00:38,367 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 16:01:33,351 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 16:01:33,351 - config - INFO - TOOL START: create_database called for database: 'dummy_db'
+2025-05-08 16:01:33,351 - config - INFO - Executing query (DB: information_schema): SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = %s...
+2025-05-08 16:01:33,351 - config - INFO - Switching database context from 'chinook' to 'information_schema'
+2025-05-08 16:01:33,366 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:01:33,366 - config - INFO - Executing query (DB: Chinook): CREATE DATABASE `dummy_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;...
+2025-05-08 16:01:33,366 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:01:33,366 - config - INFO - TOOL END: create_database. Database 'dummy_db' created successfully.
+2025-05-08 16:02:19,758 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 16:02:19,758 - config - INFO - TOOL START: list_databases called.
+2025-05-08 16:02:19,759 - config - INFO - Executing query (DB: Chinook): SHOW DATABASES...
+2025-05-08 16:02:19,760 - config - INFO - Query executed successfully, 9 rows returned.
+2025-05-08 16:02:19,761 - config - INFO - TOOL END: list_databases completed. Databases found: 9.
+2025-05-08 16:52:58,622 - config - INFO - Read-only mode: False
+2025-05-08 16:52:58,622 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 16:52:58,631 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 16:52:58,638 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 16:52:58,683 - config - INFO - Connection pool initialized successfully.
+2025-05-08 16:52:58,688 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 16:52:58,688 - config - INFO - Starting MCP server via stdio...
+2025-05-08 16:52:58,708 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 16:52:58,708 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 16:52:58,708 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 16:52:58,726 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 16:55:26,194 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 16:55:26,194 - config - INFO - TOOL START: create_vector_store called. DB: 'DUMMY_DB', Store: 'VDB_TBL', Embedding_Length: 1536, Distance_Requested: 'cosine'
+2025-05-08 16:55:26,194 - config - INFO - Using SQL distance function: 'COSINE'.
+2025-05-08 16:55:26,194 - config - INFO - Executing query (DB: information_schema): SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = %s...
+2025-05-08 16:55:26,194 - config - INFO - Switching database context from 'chinook' to 'information_schema'
+2025-05-08 16:55:26,194 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:55:26,194 - config - INFO - Database 'DUMMY_DB' does not exist. Attempting to create it.
+2025-05-08 16:55:26,194 - config - INFO - TOOL START: create_database called for database: 'DUMMY_DB'
+2025-05-08 16:55:26,194 - config - INFO - Executing query (DB: information_schema): SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = %s...
+2025-05-08 16:55:26,194 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:55:26,194 - config - INFO - Executing query (DB: Chinook): CREATE DATABASE IF NOT EXISTS `DUMMY_DB`;...
+2025-05-08 16:55:26,194 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:55:26,208 - config - INFO - TOOL END: create_database. Database 'DUMMY_DB' created successfully.
+2025-05-08 16:55:26,208 - config - INFO - Executing query (DB: information_schema): SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s...
+2025-05-08 16:55:26,211 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:55:26,211 - config - INFO - Executing query (DB: DUMMY_DB): 
+        CREATE TABLE IF NOT EXISTS `VDB_TBL` (
+            id BIGINT UNSIGNED PRIMARY KEY AUTO_INCR...
+2025-05-08 16:55:26,213 - config - INFO - Switching database context from 'information_schema' to 'DUMMY_DB'
+2025-05-08 16:55:26,254 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 16:55:26,255 - config - INFO - TOOL END: create_vector_store completed. Vector store 'VDB_TBL' created successfully in database 'DUMMY_DB' with COSINE distance.
+2025-05-08 16:55:58,662 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 16:55:58,662 - config - INFO - TOOL START: get_table_schema called. database_name=DUMMY_DB, table_name=VDB_TBL
+2025-05-08 16:55:58,662 - config - INFO - Executing query (DB: Chinook): DESCRIBE `DUMMY_DB`.`VDB_TBL`...
+2025-05-08 16:55:58,692 - config - INFO - Query executed successfully, 4 rows returned.
+2025-05-08 16:55:58,692 - config - INFO - TOOL END: get_table_schema completed. Columns found: 4. Keys: ['id', 'document', 'embedding', 'metadata']
+2025-05-08 17:46:38,262 - config - INFO - Read-only mode: False
+2025-05-08 17:46:38,262 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 17:46:38,270 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 17:46:38,276 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 17:46:38,290 - config - INFO - Connection pool initialized successfully.
+2025-05-08 17:46:38,294 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 17:46:38,294 - config - INFO - Starting MCP server via stdio...
+2025-05-08 17:46:38,315 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 17:46:38,315 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 17:46:38,315 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 17:46:38,331 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 17:48:24,726 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 17:48:24,726 - config - INFO - TOOL START: list_databases called.
+2025-05-08 17:48:24,726 - config - INFO - Executing query (DB: Chinook): SHOW DATABASES...
+2025-05-08 17:48:24,726 - config - INFO - Query executed successfully, 9 rows returned.
+2025-05-08 17:48:24,726 - config - INFO - TOOL END: list_databases completed. Databases found: 9.
+2025-05-08 17:48:31,506 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 17:48:31,506 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=CREATE TABLE IF NOT EXISTS `dummy_tbl` (
+    `col1` VARCHAR(255),
+    `col2` VARCHAR(255),
+    `col3, parameters=None
+2025-05-08 17:48:31,506 - config - INFO - Executing query (DB: chinook): CREATE TABLE IF NOT EXISTS `dummy_tbl` (
+    `col1` VARCHAR(255),
+    `col2` VARCHAR(255),
+    `col3...
+2025-05-08 17:48:31,543 - asyncmy - WARNING - Table 'dummy_tbl' already exists
+2025-05-08 17:48:31,543 - config - INFO - Query executed successfully, 0 rows returned.
+2025-05-08 17:48:31,543 - config - INFO - TOOL END: execute_sql completed. Rows returned: 0.
+2025-05-08 17:48:35,839 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 17:48:35,839 - config - INFO - TOOL START: list_tables called. database_name=chinook
+2025-05-08 17:48:35,840 - config - INFO - Executing query (DB: chinook): SHOW TABLES...
+2025-05-08 17:48:35,841 - config - INFO - Query executed successfully, 12 rows returned.
+2025-05-08 17:48:35,842 - config - INFO - TOOL END: list_tables completed. Tables found: 12.
+2025-05-08 17:49:03,567 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 17:49:03,572 - config - INFO - TOOL START: list_tables called. database_name=chinook
+2025-05-08 17:49:03,572 - config - INFO - Executing query (DB: chinook): SHOW TABLES...
+2025-05-08 17:49:03,572 - config - INFO - Query executed successfully, 12 rows returned.
+2025-05-08 17:49:03,572 - config - INFO - TOOL END: list_tables completed. Tables found: 12.
+2025-05-08 17:52:50,199 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 17:52:50,200 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=DROP TABLE IF EXISTS `dummy_tbl`;, parameters=None
+2025-05-08 17:52:50,201 - config - INFO - Executing query (DB: chinook): DROP TABLE IF EXISTS `dummy_tbl`;...
+2025-05-08 17:55:41,720 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 17:55:41,721 - config - INFO - TOOL START: execute_sql called. database_name=chinook, sql_query=DROP TABLE IF EXISTS `dummy_tbl`;, parameters=None
+2025-05-08 17:55:41,721 - config - INFO - Executing query (DB: chinook): DROP TABLE IF EXISTS `dummy_tbl`;...
+2025-05-08 17:56:38,320 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 17:56:38,324 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 17:57:20,399 - config - INFO - Closing database connection pool...
+2025-05-08 17:57:20,401 - config - INFO - Database connection pool closed.
+2025-05-08 17:57:20,404 - config - INFO - Server finished gracefully.
+2025-05-08 17:57:20,406 - config - INFO - Server exiting with code 0.
+2025-05-08 18:22:38,095 - config - INFO - Read-only mode: False
+2025-05-08 18:22:38,096 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 18:22:38,105 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 18:22:38,111 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 18:22:38,125 - config - INFO - Connection pool initialized successfully.
+2025-05-08 18:22:38,130 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 18:22:38,130 - config - INFO - Starting MCP server via stdio...
+2025-05-08 18:22:38,151 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 18:22:38,151 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 18:22:38,151 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 18:22:38,168 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 19:50:02,286 - config - INFO - Read-only mode: False
+2025-05-08 19:50:02,286 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 19:50:02,310 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 19:50:02,320 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 19:50:02,342 - config - INFO - Connection pool initialized successfully.
+2025-05-08 19:50:02,349 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 19:50:02,350 - config - INFO - Starting MCP server via stdio...
+2025-05-08 19:50:02,390 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 19:50:02,393 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 19:50:02,397 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 19:50:02,438 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 20:00:02,672 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 20:00:02,680 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 20:10:02,685 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 20:10:02,696 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 20:20:02,673 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-08 20:20:02,682 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2025-05-08 20:24:13,910 - config - INFO - Read-only mode: False
+2025-05-08 20:24:13,911 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 20:24:13,972 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 20:24:13,996 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 20:24:14,109 - config - INFO - Connection pool initialized successfully.
+2025-05-08 20:24:14,124 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 20:24:14,125 - config - INFO - Starting MCP server via stdio...
+2025-05-08 20:24:14,189 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 20:24:14,700 - config - INFO - Read-only mode: False
+2025-05-08 20:24:14,701 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-08 20:24:14,893 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-08 20:24:14,959 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-08 20:24:15,003 - config - INFO - Connection pool initialized successfully.
+2025-05-08 20:24:15,020 - config - INFO - Registered MCP tools explicitly.
+2025-05-08 20:24:15,023 - config - INFO - Starting MCP server via stdio...
+2025-05-08 20:24:15,055 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-08 20:24:26,733 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 20:24:26,734 - config - INFO - TOOL START: list_databases called.
+2025-05-08 20:24:26,735 - config - INFO - Executing query (DB: Chinook): SHOW DATABASES...
+2025-05-08 20:24:26,738 - config - INFO - Query executed successfully, 9 rows returned.
+2025-05-08 20:24:26,739 - config - INFO - TOOL END: list_databases completed. Databases found: 9.
+2025-05-08 20:24:32,103 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 20:24:32,104 - config - INFO - TOOL START: list_tables called. database_name=chinook
+2025-05-08 20:24:32,105 - config - INFO - Executing query (DB: chinook): SHOW TABLES...
+2025-05-08 20:24:32,110 - config - INFO - Query executed successfully, 12 rows returned.
+2025-05-08 20:24:32,110 - config - INFO - TOOL END: list_tables completed. Tables found: 12.
+2025-05-08 20:24:37,414 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 20:24:37,415 - config - INFO - TOOL START: get_table_schema called. database_name=chinook, table_name=album
+2025-05-08 20:24:37,415 - config - INFO - Executing query (DB: Chinook): DESCRIBE `chinook`.`album`...
+2025-05-08 20:24:37,459 - config - INFO - Query executed successfully, 3 rows returned.
+2025-05-08 20:24:37,461 - config - INFO - TOOL END: get_table_schema completed. Columns found: 3. Keys: ['AlbumId', 'Title', 'ArtistId']
+2025-05-08 20:24:42,643 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 20:24:42,644 - config - INFO - TOOL START: get_table_schema called. database_name=chinook, table_name=artist
+2025-05-08 20:24:42,645 - config - INFO - Executing query (DB: Chinook): DESCRIBE `chinook`.`artist`...
+2025-05-08 20:24:42,691 - config - INFO - Query executed successfully, 2 rows returned.
+2025-05-08 20:24:42,693 - config - INFO - TOOL END: get_table_schema completed. Columns found: 2. Keys: ['ArtistId', 'Name']
+2025-05-08 20:24:45,784 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 20:24:45,785 - config - INFO - TOOL START: get_table_schema called. database_name=chinook, table_name=customer
+2025-05-08 20:24:45,786 - config - INFO - Executing query (DB: Chinook): DESCRIBE `chinook`.`customer`...
+2025-05-08 20:24:45,813 - config - INFO - Query executed successfully, 13 rows returned.
+2025-05-08 20:24:45,813 - config - INFO - TOOL END: get_table_schema completed. Columns found: 13. Keys: ['CustomerId', 'FirstName', 'LastName', 'Company', 'Address', 'City', 'State', 'Country', 'PostalCode', 'Phone', 'Fax', 'Email', 'SupportRepId']
+2025-05-08 20:24:49,074 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 20:24:49,076 - config - INFO - TOOL START: get_table_schema called. database_name=chinook, table_name=dummy_tbl
+2025-05-08 20:24:49,076 - config - INFO - Executing query (DB: Chinook): DESCRIBE `chinook`.`dummy_tbl`...
+2025-05-08 20:24:49,112 - config - INFO - Query executed successfully, 4 rows returned.
+2025-05-08 20:24:49,113 - config - INFO - TOOL END: get_table_schema completed. Columns found: 4. Keys: ['id', 'name', 'value', 'created_at']
+2025-05-08 20:24:51,549 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-05-08 21:15:48,268 - config - INFO - TOOL START: get_table_schema called. database_name=chinook, table_name=employee
+2025-05-08 21:15:48,269 - config - INFO - Executing query (DB: Chinook): DESCRIBE `chinook`.`employee`...
+2025-05-08 21:15:48,293 - config - INFO - Query executed successfully, 15 rows returned.
+2025-05-08 21:15:48,293 - config - INFO - TOOL END: get_table_schema completed. Columns found: 15. Keys: ['EmployeeId', 'LastName', 'FirstName', 'Title', 'ReportsTo', 'BirthDate', 'HireDate', 'Address', 'City', 'State', 'Country', 'PostalCode', 'Phone', 'Fax', 'Email']
+2025-05-08 21:15:48,298 - config - CRITICAL - Server execution failed with an unexpected error: unhandled errors in a TaskGroup (1 sub-exception)
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 514, in run_async_server
+  |     await self.mcp.run_async(transport=transport, **transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 283, in run_async
+  |     await self.run_stdio_async(**transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 811, in run_stdio_async
+  |     async with stdio_server() as (read_stream, write_stream):
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(typ, value, traceback)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 83, in stdio_server
+  |     async with anyio.create_task_group() as tg:
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 86, in stdio_server
+    |     yield read_stream, write_stream
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 812, in run_stdio_async
+    |     await self._mcp_server.run(
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 483, in run
+    |     async with AsyncExitStack() as stack:
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 745, in __aexit__
+    |     raise exc_details[1]
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 728, in __aexit__
+    |     cb_suppress = await cb(*exc_details)
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 209, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Exception Group Traceback (most recent call last):
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 489, in run
+      |     async with anyio.create_task_group() as tg:
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+      |     raise BaseExceptionGroup(
+      | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+      +-+---------------- 1 ----------------
+        | Traceback (most recent call last):
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 517, in _handle_message
+        |     await self._handle_request(
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 563, in _handle_request
+        |     await message.respond(response)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 122, in respond
+        |     await self._session._send_response(  # type: ignore[reportPrivateUsage]
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 303, in _send_response
+        |     await self._write_stream.send(JSONRPCMessage(jsonrpc_response))
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 242, in send
+        |     self.send_nowait(item)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 211, in send_nowait
+        |     raise ClosedResourceError
+        | anyio.ClosedResourceError
+        +------------------------------------
+2025-05-08 21:15:48,485 - config - INFO - Closing database connection pool...
+2025-05-08 21:15:48,487 - config - INFO - Database connection pool closed.
+2025-05-08 21:15:48,489 - config - CRITICAL - Server failed to start or crashed: unhandled errors in a TaskGroup (1 sub-exception)
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 546, in <module>
+  |     anyio.run(
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_core\_eventloop.py", line 74, in run
+  |     return async_backend.run(func, args, {}, backend_options)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2310, in run
+  |     return runner.run(wrapper())
+  |            ^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\asyncio\runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\asyncio\base_events.py", line 653, in run_until_complete
+  |     return future.result()
+  |            ^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2298, in wrapper
+  |     return await func(*args)
+  |            ^^^^^^^^^^^^^^^^^
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\server.py", line 514, in run_async_server
+  |     await self.mcp.run_async(transport=transport, **transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 283, in run_async
+  |     await self.run_stdio_async(**transport_kwargs)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 811, in run_stdio_async
+  |     async with stdio_server() as (read_stream, write_stream):
+  |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 231, in __aexit__
+  |     await self.gen.athrow(typ, value, traceback)
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 83, in stdio_server
+  |     async with anyio.create_task_group() as tg:
+  |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\stdio.py", line 86, in stdio_server
+    |     yield read_stream, write_stream
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\fastmcp\server\server.py", line 812, in run_stdio_async
+    |     await self._mcp_server.run(
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 483, in run
+    |     async with AsyncExitStack() as stack:
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 745, in __aexit__
+    |     raise exc_details[1]
+    |   File "C:\Users\Mullangi.Vijay\AppData\Local\anaconda3\envs\python3dot11\Lib\contextlib.py", line 728, in __aexit__
+    |     cb_suppress = await cb(*exc_details)
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 209, in __aexit__
+    |     return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+    |     raise BaseExceptionGroup(
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Exception Group Traceback (most recent call last):
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 489, in run
+      |     async with anyio.create_task_group() as tg:
+      |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 772, in __aexit__
+      |     raise BaseExceptionGroup(
+      | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+      +-+---------------- 1 ----------------
+        | Traceback (most recent call last):
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 517, in _handle_message
+        |     await self._handle_request(
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\server\lowlevel\server.py", line 563, in _handle_request
+        |     await message.respond(response)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 122, in respond
+        |     await self._session._send_response(  # type: ignore[reportPrivateUsage]
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\mcp\shared\session.py", line 303, in _send_response
+        |     await self._write_stream.send(JSONRPCMessage(jsonrpc_response))
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 242, in send
+        |     self.send_nowait(item)
+        |   File "C:\Users\Mullangi.Vijay\CascadeProjects\mcp-mariadb-server\.venv\Lib\site-packages\anyio\streams\memory.py", line 211, in send_nowait
+        |     raise ClosedResourceError
+        | anyio.ClosedResourceError
+        +------------------------------------
+2025-05-08 21:15:48,536 - config - INFO - Server exiting with code 1.
+2025-05-09 07:43:57,395 - config - INFO - Read-only mode: False
+2025-05-09 07:43:57,400 - config - INFO - Logging to console and to file: logs/mcp_server.log (Level: INFO, MaxSize: 10485760B, Backups: 5)
+2025-05-09 07:43:57,458 - config - INFO - Initializing MariaDB_Ops_Server...
+2025-05-09 07:43:57,480 - config - INFO - Creating connection pool for root@localhost:3306/Chinook (max size: 10)
+2025-05-09 07:43:57,515 - config - INFO - Connection pool initialized successfully.
+2025-05-09 07:43:57,528 - config - INFO - Registered MCP tools explicitly.
+2025-05-09 07:43:57,529 - config - INFO - Starting MCP server via stdio...
+2025-05-09 07:43:57,591 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-09 07:43:57,595 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-05-09 07:43:57,599 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2025-05-09 07:43:57,638 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
