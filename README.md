@@ -42,14 +42,14 @@ Using the MariaDB Vector MCP server, users can for example:
 First clone the repository:
 
 ```bash
-git clone https://github.com/DavidRamosSal/mcp-server-mariadb-vector.git
+git clone https://github.com/MariaDB/mcp mcp-server-mariadb-vector
 ```
 
 There are two ways to run the MariaDB Vector MCP server: as a Python package using **uv** or as a **Docker container** built from the provided Dockerfile.
 
 ### Requirements for running the server using uv
 
-- MariaDB Connector/C - [installation instructions](https://mariadb.com/docs/server/connect/programming-languages/c/install)
+- MariaDB Connector/C - [installation instructions](https://mariadb.com/kb/en/mariadb-connector-c/)
 - uv - [installation instructions](https://docs.astral.sh/uv/#installation)
 
 ### Requirements for running the server as a Docker container
