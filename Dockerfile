@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -LsSO https://r.mariadb.com/downloads/mariadb_repo_setup && \
     echo "c4a0f3dade02c51a6a28ca3609a13d7a0f8910cccbb90935a2f218454d3a914a  mariadb_repo_setup" | sha256sum -c - && \
     chmod +x mariadb_repo_setup && \
-    ./mariadb_repo_setup --mariadb-server-version="mariadb-11.7" && \
+    ./mariadb_repo_setup --mariadb-server-version="mariadb-11.8" && \
     rm mariadb_repo_setup && \
     apt-get update && \
     apt-get install -y --no-install-recommends \

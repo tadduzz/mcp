@@ -36,7 +36,7 @@ Using the MariaDB Vector MCP server, users can for example:
 > **Note:** From here on, it is assumed that you have a running MariaDB instance with vector support (version **11.7** or higher). If you don't have one, you can quickly spin up a MariaDB instance using Docker:
 >
 > ```bash
-> docker run -p 3306:3306 --name mariadb-instance -e MARIADB_ROOT_PASSWORD=password -e MARIADB_DATABASE=database_name mariadb:11.7
+> docker run -p 3306:3306 --name mariadb-instance -e MARIADB_ROOT_PASSWORD=password -e MARIADB_DATABASE=database_name mariadb:11.8
 > ```
 
 First clone the repository:
