@@ -1,6 +1,6 @@
 # MCP MariaDB Server
 
-The MCP MariaDB Server provides a Model Context Protocol (MCP) interface for managing and querying MariaDB databases, supporting both standard SQL operations and advanced vector/embedding-based search. Designed for use with AI assistants (like Cascade), it enables seamless integration of AI-driven data workflows with relational and vector databases.
+The MCP MariaDB Server provides a Model Context Protocol (MCP) interface for managing and querying MariaDB databases, supporting both standard SQL operations and advanced vector/embedding-based search. Designed for use with AI assistants, it enables seamless integration of AI-driven data workflows with relational and vector databases.
 
 ---
 
