@@ -1,4 +1,3 @@
-# config.py
 import os
 from dotenv import load_dotenv
 import logging
@@ -42,7 +41,6 @@ file_handler = RotatingFileHandler(
 file_handler.setFormatter(log_formatter)
 root_logger.addHandler(file_handler)
 
-# The specific logger used in server.py and elsewhere will inherit this configuration.
 logger = logging.getLogger(__name__)
 
 # --- Database Configuration ---
@@ -53,15 +51,28 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
 # --- MCP Server Configuration ---
-# Read-only mode check [cite: 93]
 MCP_READ_ONLY = os.getenv("MCP_READ_ONLY", "true").lower() == "true"
-MCP_MAX_POOL_SIZE = int(os.getenv("MCP_MAX_POOL_SIZE", 10)) # Max connections in pool [cite: 57]
+MCP_MAX_POOL_SIZE = int(os.getenv("MCP_MAX_POOL_SIZE", 10))
+
+# --- Embedding Configuration ---
+# Provider selection ('openai' or 'gemini')
+EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "openai").lower()
+# API Keys
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # --- Validation ---
 if not all([DB_USER, DB_PASSWORD, DB_NAME]):
     logger.error("Database credentials (DB_USER, DB_PASSWORD, DB_NAME) not found in environment variables or .env file.")
-    # In a real app, you might exit or raise a configuration error
-    # For now, we log the error; asyncmy.create_pool will likely fail later.
+
+# Embedding Provider and Keys
+logger.info(f"Selected Embedding Provider: {EMBEDDING_PROVIDER}")
+if EMBEDDING_PROVIDER == "openai":
+    if not OPENAI_API_KEY:
+        logger.error("EMBEDDING_PROVIDER is 'openai' but OPENAI_API_KEY is missing.")
+        raise ValueError("OpenAI API key is required when EMBEDDING_PROVIDER is 'openai'.")
+else:
+    logger.error(f"Invalid EMBEDDING_PROVIDER specified: '{EMBEDDING_PROVIDER}'. Use 'openai' or 'gemini'.")
+    raise ValueError(f"Invalid EMBEDDING_PROVIDER: '{EMBEDDING_PROVIDER}'.")
 
 logger.info(f"Read-only mode: {MCP_READ_ONLY}")
 logger.info(f"Logging to console and to file: {LOG_FILE_PATH} (Level: {LOG_LEVEL}, MaxSize: {LOG_MAX_BYTES}B, Backups: {LOG_BACKUP_COUNT})")
