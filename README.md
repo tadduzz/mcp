@@ -1,60 +1,256 @@
 # MCP MariaDB Server
 
-This project implements an MCP (Model Context Protocol) server that provides tools for interacting with a MariaDB database via an AI Assistant like Cascade.
+The MCP MariaDB Server provides a Model Context Protocol (MCP) interface for managing and querying MariaDB databases, supporting both standard SQL operations and advanced vector/embedding-based search. Designed for use with AI assistants (like Cascade), it enables seamless integration of AI-driven data workflows with relational and vector databases.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Core Components](#core-components)
+- [Available Tools](#available-tools)
+- [Embeddings & Vector Store](#embeddings--vector-store)
+- [Configuration & Environment Variables](#configuration--environment-variables)
+- [Installation & Setup](#installation--setup)
+- [Usage Examples](#usage-examples)
+- [Logging](#logging)
+- [Testing](#testing)
+- [Troubleshooting & FAQ](#troubleshooting--faq)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Overview
+
+The MCP MariaDB Server exposes a set of tools for interacting with MariaDB databases and vector stores via a standardized protocol. It supports:
+- Listing databases and tables
+- Retrieving table schemas
+- Executing safe, read-only SQL queries
+- Creating and managing vector stores for embedding-based search
+- Integrating with embedding providers (currently OpenAI)
+
+---
 
 ## Core Components
 
-*   `server.py`: Contains the main MCP server logic and tool definitions.
-*   `config.py`: Handles loading configuration (likely from `.env`).
-*   `tests/`: Contains manual test documentation for the MCP tools.
+- **server.py**: Main MCP server logic and tool definitions.
+- **config.py**: Loads configuration from environment and `.env` files.
+- **embeddings.py**: Handles embedding service integration (OpenAI).
+- **tests/**: Manual and automated test documentation and scripts.
+
+---
 
 ## Available Tools
 
-This server provides the following tools for interacting with MariaDB:
+### Standard Database Tools
 
-*   **`list_databases`**:
-    *   **Functionality:** Lists all accessible databases on the connected MariaDB server.
-    *   **Parameters:** None.
-*   **`list_tables`**:
-    *   **Functionality:** Lists all tables within a specified database.
-    *   **Parameters:** `database_name` (string, required).
-*   **`get_table_schema`**:
-    *   **Functionality:** Retrieves the schema (column names, types, etc.) for a specific table in a database.
-    *   **Parameters:** `database_name` (string, required), `table_name` (string, required).
-*   **`execute_sql`**:
-    *   **Functionality:** Executes a read-only SQL query (e.g., `SELECT`, `SHOW`, `DESCRIBE`) against a specified database. Supports parameterized queries (`%s` placeholders) for safety. If `MCP_READ_ONLY` is enabled in the configuration, it attempts to prevent non-read-only commands.
-    *   **Parameters:** `sql_query` (string, required), `database_name` (string, required), `parameters` (list, optional - values corresponding to `%s` placeholders).
+- **list_databases**
+  - Lists all accessible databases.
+  - Parameters: _None_
 
-## Setup
+- **list_tables**
+  - Lists all tables in a specified database.
+  - Parameters: `database_name` (string, required)
 
-1.  **Environment:** This project uses `uv` for dependency management (indicated by `uv.lock`). Ensure `uv` is installed.
-2.  **Configuration:** Create a `.env` file in the root directory with your MariaDB connection details. Example:
-    ```dotenv
-    # Example .env content
-    DB_HOST=localhost
-    DB_USER=your_db_user
-    DB_PASSWORD=your_db_password
-    # DB_PORT=3306 # Optional, defaults to 3306 if omitted
-    # DB_NAME=your_default_database # Optional, can often be specified per query
+- **get_table_schema**
+  - Retrieves schema for a table (columns, types, keys, etc.).
+  - Parameters: `database_name` (string, required), `table_name` (string, required)
 
-    # Optional: Enforce read-only mode for execute_sql
-    # Set to True or 1 to enable. If omitted or set to False/0, the check might be less strict.
-    # MCP_READ_ONLY=True
-    ```
-3.  **Dependencies:** Install the required Python packages:
-    ```bash
-    uv pip sync
-    ```
-4.  **Running the Server:** Start the MCP server (adjust the command if `main.py` is the entry point instead of `server.py`):
-    ```bash
-    python server.py
-    ```
+- **execute_sql**
+  - Executes a read-only SQL query (`SELECT`, `SHOW`, `DESCRIBE`).
+  - Parameters: `sql_query` (string, required), `database_name` (string, optional), `parameters` (list, optional)
+  - _Note: Enforces read-only mode if `MCP_READ_ONLY` is enabled._
+  
+- **create_database**
+  - Creates a new database if it doesn't exist.
+  - Parameters: `database_name` (string, required)  
+
+### Vector Store & Embedding Tools
+
+- **create_vector_store**
+  - Creates a new vector store (table) for embeddings.
+  - Parameters: `database_name`, `vector_store_name`, `model_name` (optional), `distance_function` (optional, default: cosine)
+
+- **delete_vector_store**
+  - Deletes a vector store (table).
+  - Parameters: `database_name`, `vector_store_name`
+
+- **list_vector_stores**
+  - Lists all vector stores in a database.
+  - Parameters: `database_name`
+
+- **insert_docs_vector_store**
+  - Batch inserts documents (and optional metadata) into a vector store.
+  - Parameters: `database_name`, `vector_store_name`, `documents` (list of strings), `metadata` (optional list of dicts)
+
+- **search_vector_store**
+  - Performs semantic search for similar documents using embeddings.
+  - Parameters: `database_name`, `vector_store_name`, `user_query` (string), `k` (optional, default: 7)
+
+---
+
+## Embeddings & Vector Store
+
+### Supported Providers
+
+- **OpenAI** (fully supported)
+
+### Configuration
+
+- `EMBEDDING_PROVIDER`: Set to `openai` (default; only supported option)
+- `OPENAI_API_KEY`: Required if using OpenAI embeddings
+
+### Model Selection
+
+- Default and allowed models are configurable in code (`DEFAULT_OPENAI_MODEL`, `ALLOWED_OPENAI_MODELS`)
+- Model can be selected per request or defaults to the configured model
+
+### Vector Store Schema
+
+A vector store table has the following columns:
+- `id`: Auto-increment primary key
+- `document`: Text of the document
+- `embedding`: VECTOR type (indexed for similarity search)
+- `metadata`: JSON (optional metadata)
+
+---
+
+## Configuration & Environment Variables
+
+All configuration is via environment variables (typically set in a `.env` file):
+
+| Variable              | Description                                            | Required | Default      |
+|-----------------------|--------------------------------------------------------|----------|--------------|
+| `DB_HOST`             | MariaDB host address                                   | Yes      | `localhost`  |
+| `DB_PORT`             | MariaDB port                                           | No       | `3306`       |
+| `DB_USER`             | MariaDB username                                       | Yes      |              |
+| `DB_PASSWORD`         | MariaDB password                                       | Yes      |              |
+| `DB_NAME`             | Default database (optional; can be set per query)      | No       |              |
+| `MCP_READ_ONLY`       | Enforce read-only SQL mode (`true`/`false`)            | No       | `true`       |
+| `MCP_MAX_POOL_SIZE`   | Max DB connection pool size                            | No       | `10`         |
+| `EMBEDDING_PROVIDER`  | Embedding provider (`openai`)                          | No       | `openai`     |
+| `OPENAI_API_KEY`      | API key for OpenAI embeddings                          | Yes (if using embeddings) | |
+| `DEFAULT_OPENAI_MODEL`| Default OpenAI embedding model                         | No       | see code     |
+| `ALLOWED_OPENAI_MODELS`| Allowed OpenAI models (comma-separated)               | No       | see code     |
+
+#### Example `.env` file
+
+```dotenv
+DB_HOST=localhost
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_PORT=3306
+DB_NAME=your_default_database
+
+MCP_READ_ONLY=true
+MCP_MAX_POOL_SIZE=10
+
+EMBEDDING_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+DEFAULT_OPENAI_MODEL=text-embedding-3-small
+ALLOWED_OPENAI_MODELS=text-embedding-3-small,text-embedding-ada-002
+```
+
+---
+
+## Installation & Setup
+
+### Requirements
+
+- **Python 3.11** (see `.python-version`)
+- **uv** (dependency manager; [install instructions](https://github.com/astral-sh/uv))
+- MariaDB server (local or remote)
+
+### Steps
+
+1. **Clone the repository**
+2. **Install `uv`** (if not already):
+   ```bash
+   pip install uv
+   ```
+3. **Install dependencies**
+   ```bash
+   uv pip sync
+   ```
+4. **Create `.env`** in the project root (see [Configuration](#configuration--environment-variables))
+5. **Run the server**
+   ```bash
+   python server.py
+   ```
+   _Adjust entry point if needed (e.g., `main.py`)_
+
+---
+
+## Usage Examples
+
+### Standard SQL Query
+
+```python
+{
+  "tool": "execute_sql",
+  "parameters": {
+    "database_name": "test_db",
+    "sql_query": "SELECT * FROM users WHERE id = %s",
+    "parameters": [123]
+  }
+}
+```
+
+### Create Vector Store
+
+```python
+{
+  "tool": "create_vector_store",
+  "parameters": {
+    "database_name": "test_db",
+    "vector_store_name": "my_vectors",
+    "model_name": "text-embedding-3-small",
+    "distance_function": "cosine"
+  }
+}
+```
+
+### Insert Documents into Vector Store
+
+```python
+{
+  "tool": "insert_docs_vector_store",
+  "parameters": {
+    "database_name": "test_db",
+    "vector_store_name": "my_vectors",
+    "documents": ["Sample text 1", "Sample text 2"],
+    "metadata": [{"source": "doc1"}, {"source": "doc2"}]
+  }
+}
+```
+
+### Semantic Search
+
+```python
+{
+  "tool": "search_vector_store",
+  "parameters": {
+    "database_name": "test_db",
+    "vector_store_name": "my_vectors",
+    "user_query": "What is the capital of France?",
+    "k": 5
+  }
+}
+```
+
+---
+
+## Logging
+
+- Logs are written to `logs/mcp_server.log` by default.
+- Log messages include tool calls, configuration issues, embedding errors, and client requests.
+- Log level and output can be adjusted in the code (see `config.py` and logger setup).
+
+---
 
 ## Testing
 
-Manual tests focusing on the read-only capabilities of the MCP tools were performed using an AI Assistant.
-
-Details about the testing approach, specific test cases, and observed results can be found in the `tests` directory:
-
-*   See `tests/README.md` for an overview.
-*   See `tests/test_mariadb_mcp_tools.py` for documented test steps.
+- Tests are located in the `tests/` directory.
+- See `tests/README.md` for an overview and `tests/test_mariadb_mcp_tools.py` for sample test cases.
+- Tests cover both standard SQL and vector/embedding tool operations.
