@@ -15,10 +15,6 @@ The MCP MariaDB Server provides a Model Context Protocol (MCP) interface for man
 - [Usage Examples](#usage-examples)
 - [Logging](#logging)
 - [Testing](#testing)
-- [Troubleshooting & FAQ](#troubleshooting--faq)
-- [Contributing](#contributing)
-- [License](#license)
-
 ---
 
 ## Overview
