@@ -15,6 +15,8 @@ The primary goal of these tests was to verify the basic functionality and robust
 
 Tests were performed **manually** via the AI Assistant interface. The interface invoked the MCP tools directly based on user requests, and the results (or errors) were observed in the assistant's responses.
 
+From there, tests were converted into code in test_mariadb_mcp_tools.py`. We use the python `unittest` framework to structure the tests.
+
 ## Test Cases
 
 The specific test cases executed are documented in the `test_mariadb_mcp_tools.py` script within this directory. This script serves as a record of the manual tests performed and includes:
