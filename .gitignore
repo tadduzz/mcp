@@ -1,0 +1,9 @@
+# .gitignore
+.venv/
+__pycache__/
+logs/*
+*.pyc
+*.pyo
+*.pyd
+.env
+uv.lock
