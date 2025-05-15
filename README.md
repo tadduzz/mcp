@@ -130,10 +130,10 @@ All configuration is via environment variables (typically set in a `.env` file):
 | `DB_NAME`              | Default database (optional; can be set per query)      | No       |              |
 | `MCP_READ_ONLY`        | Enforce read-only SQL mode (`true`/`false`)            | No       | `true`       |
 | `MCP_MAX_POOL_SIZE`    | Max DB connection pool size                            | No       | `10`         |
-| `EMBEDDING_PROVIDER`   | Embedding provider (`openai`)                          | No       | `openai`     |
+| `EMBEDDING_PROVIDER`   | Embedding provider (`openai`/`gemini`/`huggingface`)   | No       | `openai`     |
 | `OPENAI_API_KEY`       | API key for OpenAI embeddings                          | Yes (if using embeddings) | |
 | `GEMINII_API_KEY`      | API key for Gemini embeddings                          | Yes (if using embeddings) | |
-| `HF_MODEL`             | Open model from Huggingface                            | Yes (if using embeddings) | |
+| `HF_MODEL`             | Open models from Huggingface                           | Yes (if using embeddings) | |
 
 #### Example `.env` file
 
