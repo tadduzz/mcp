@@ -13,7 +13,7 @@ The MCP MariaDB Server provides a Model Context Protocol (MCP) interface for man
 - [Configuration & Environment Variables](#configuration--environment-variables)
 - [Installation & Setup](#installation--setup)
 - [Usage Examples](#usage-examples)
-- [Integration - Claude desktop/Cursor/Windsurf](#integration)
+- [Integration - Claude desktop/Cursor/Windsurf](#integration---claude-desktopcursorwindsurf)
 - [Logging](#logging)
 - [Testing](#testing)
 ---
