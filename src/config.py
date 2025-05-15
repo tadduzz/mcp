@@ -1,3 +1,4 @@
+# config.py
 import os
 from dotenv import load_dotenv
 import logging
@@ -41,6 +42,7 @@ file_handler = RotatingFileHandler(
 file_handler.setFormatter(log_formatter)
 root_logger.addHandler(file_handler)
 
+# The specific logger used in server.py and elsewhere will inherit this configuration.
 logger = logging.getLogger(__name__)
 
 # --- Database Configuration ---
@@ -51,14 +53,19 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
 # --- MCP Server Configuration ---
+# Read-only mode
 MCP_READ_ONLY = os.getenv("MCP_READ_ONLY", "true").lower() == "true"
 MCP_MAX_POOL_SIZE = int(os.getenv("MCP_MAX_POOL_SIZE", 10))
 
 # --- Embedding Configuration ---
-# Provider selection ('openai' or 'gemini')
+# Provider selection ('openai' or 'gemini' or 'huggingface')
 EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "openai").lower()
 # API Keys
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# Open models from Huggingface
+HF_MODEL = os.getenv("HF_MODEL")
+
 
 # --- Validation ---
 if not all([DB_USER, DB_PASSWORD, DB_NAME]):
@@ -70,8 +77,16 @@ if EMBEDDING_PROVIDER == "openai":
     if not OPENAI_API_KEY:
         logger.error("EMBEDDING_PROVIDER is 'openai' but OPENAI_API_KEY is missing.")
         raise ValueError("OpenAI API key is required when EMBEDDING_PROVIDER is 'openai'.")
+elif EMBEDDING_PROVIDER == "gemini":
+    if not GEMINI_API_KEY:
+        logger.error("EMBEDDING_PROVIDER is 'gemini' but GEMINI_API_KEY is missing.")
+        raise ValueError("Gemini API key is required when EMBEDDING_PROVIDER is 'gemini'.")
+elif EMBEDDING_PROVIDER == "huggingface":
+    if not HF_MODEL:
+        logger.error("EMBEDDING_PROVIDER is 'huggingface' but HF_MODEL is missing.")
+        raise ValueError("HuggingFace model is required when EMBEDDING_PROVIDER is 'huggingface'.")
 else:
-    logger.error(f"Invalid EMBEDDING_PROVIDER specified: '{EMBEDDING_PROVIDER}'. Use 'openai' or 'gemini'.")
+    logger.error(f"Invalid EMBEDDING_PROVIDER specified: '{EMBEDDING_PROVIDER}'. Use 'openai' or 'gemini' or 'huggingface'.")
     raise ValueError(f"Invalid EMBEDDING_PROVIDER: '{EMBEDDING_PROVIDER}'.")
 
 logger.info(f"Read-only mode: {MCP_READ_ONLY}")
