@@ -13,6 +13,7 @@ The MCP MariaDB Server provides a Model Context Protocol (MCP) interface for man
 - [Configuration & Environment Variables](#configuration--environment-variables)
 - [Installation & Setup](#installation--setup)
 - [Usage Examples](#usage-examples)
+- [Integration - Claude desktop/Cursor/Windsurf](#integration---claude-desktopcursorwindsurf)
 - [Logging](#logging)
 - [Testing](#testing)
 ---
@@ -90,12 +91,16 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
 
 ### Supported Providers
 
-- **OpenAI** (fully supported)
+- **OpenAI**
+- **Gemini**
+- **Open models from Huggingface**
 
 ### Configuration
 
-- `EMBEDDING_PROVIDER`: Set to `openai` (default; only supported option)
+- `EMBEDDING_PROVIDER`: Set to `openai` (default option), can change it to required providers
 - `OPENAI_API_KEY`: Required if using OpenAI embeddings
+- GEMINI_API_KEY`: Required if using Gemini embeddings
+- Open models from HUGGINGFACE: Required open model currently provided option for "intfloat/multilingual-e5-large-instruct" & "BAAI/bge-m3"
 
 ### Model Selection
 
@@ -116,19 +121,19 @@ A vector store table has the following columns:
 
 All configuration is via environment variables (typically set in a `.env` file):
 
-| Variable              | Description                                            | Required | Default      |
-|-----------------------|--------------------------------------------------------|----------|--------------|
-| `DB_HOST`             | MariaDB host address                                   | Yes      | `localhost`  |
-| `DB_PORT`             | MariaDB port                                           | No       | `3306`       |
-| `DB_USER`             | MariaDB username                                       | Yes      |              |
-| `DB_PASSWORD`         | MariaDB password                                       | Yes      |              |
-| `DB_NAME`             | Default database (optional; can be set per query)      | No       |              |
-| `MCP_READ_ONLY`       | Enforce read-only SQL mode (`true`/`false`)            | No       | `true`       |
-| `MCP_MAX_POOL_SIZE`   | Max DB connection pool size                            | No       | `10`         |
-| `EMBEDDING_PROVIDER`  | Embedding provider (`openai`)                          | No       | `openai`     |
-| `OPENAI_API_KEY`      | API key for OpenAI embeddings                          | Yes (if using embeddings) | |
-| `DEFAULT_OPENAI_MODEL`| Default OpenAI embedding model                         | No       | see code     |
-| `ALLOWED_OPENAI_MODELS`| Allowed OpenAI models (comma-separated)               | No       | see code     |
+| Variable               | Description                                            | Required | Default      |
+|------------------------|--------------------------------------------------------|----------|--------------|
+| `DB_HOST`              | MariaDB host address                                   | Yes      | `localhost`  |
+| `DB_PORT`              | MariaDB port                                           | No       | `3306`       |
+| `DB_USER`              | MariaDB username                                       | Yes      |              |
+| `DB_PASSWORD`          | MariaDB password                                       | Yes      |              |
+| `DB_NAME`              | Default database (optional; can be set per query)      | No       |              |
+| `MCP_READ_ONLY`        | Enforce read-only SQL mode (`true`/`false`)            | No       | `true`       |
+| `MCP_MAX_POOL_SIZE`    | Max DB connection pool size                            | No       | `10`         |
+| `EMBEDDING_PROVIDER`   | Embedding provider (`openai`/`gemini`/`huggingface`)   | No       | `openai`     |
+| `OPENAI_API_KEY`       | API key for OpenAI embeddings                          | Yes (if using embeddings) | |
+| `GEMINII_API_KEY`      | API key for Gemini embeddings                          | Yes (if using embeddings) | |
+| `HF_MODEL`             | Open models from Huggingface                           | Yes (if using embeddings) | |
 
 #### Example `.env` file
 
@@ -144,8 +149,8 @@ MCP_MAX_POOL_SIZE=10
 
 EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=sk-...
-DEFAULT_OPENAI_MODEL=text-embedding-3-small
-ALLOWED_OPENAI_MODELS=text-embedding-3-small,text-embedding-ada-002
+GEMINI_API_KEY=AI...
+HF_MODEL="BAAI/bge-m3"
 ```
 
 ---
@@ -234,7 +239,26 @@ ALLOWED_OPENAI_MODELS=text-embedding-3-small,text-embedding-ada-002
   }
 }
 ```
+---
 
+## Integration - Claude desktop/Cursor/Windsurf
+
+```python
+{
+  "mcpServers": {
+    "MariaDB_Server": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "path/to/mariadb-mcp-server/",
+        "run",
+        "server.py"
+        ],
+        "envFile": "path/to/mcp-server-mariadb-vector/.env"      
+    }
+  }
+}
+```
 ---
 
 ## Logging
