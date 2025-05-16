@@ -40,7 +40,7 @@ class MariaDBServer:
 
     async def create_vector_store(self, database_name: str, vector_store_name: str, model_name: Optional[str] = None, distance_function: Optional[str] = None) -> dict:
         """
-        This tool helps in creating a table which stores embeddings.
+        This tool creates a table which stores embeddings.
         
         Creates a new vector store (table) with a predefined schema if it doesn't already exist.
         It first checks if the database exists, creating it if necessary.
@@ -359,11 +359,11 @@ class MariaDBServer:
     async def create_vector_store_tool(self,
                                   database_name: str,
                                   vector_store_name: str,
-                                  embedding_service,
+                                  embedding_service: EmbeddingService,
                                   model_name: Optional[str] = None,
                                   distance_function: Optional[str] = None) -> Dict[str, Any]:
         """
-        THIS TOOL HELPS IN CREATING A TABLE WHICH STORES EMBEDDINGS.
+        This tool creates a new table which stores embeddings.
 
         Creates a new vector store (table) with a predefined schema if it doesn't already exist.
         It first checks if the database exists, creating it if necessary.

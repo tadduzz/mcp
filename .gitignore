@@ -8,3 +8,4 @@ src/logs/*
 *.pyd
 .env
 uv.lock
+.DS_Store
