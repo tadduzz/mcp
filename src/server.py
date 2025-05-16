@@ -28,9 +28,10 @@ class MariaDBServer:
     MCP Server exposing tools to interact with a MariaDB database.
     Manages the database connection pool.
     """
-    def __init__(self, server_name="MariaDB_Server"):
+    def __init__(self, server_name="MariaDB_Server", autocommit=True):
         self.mcp = FastMCP(server_name)
         self.pool: Optional[asyncmy.Pool] = None
+        self.autocommit=autocommit
         self.is_read_only = MCP_READ_ONLY
         logger.info(f"Initializing {server_name}...")
         if self.is_read_only:
@@ -38,8 +39,8 @@ class MariaDBServer:
 
     async def create_vector_store(self, database_name: str, vector_store_name: str, model_name: Optional[str] = None, distance_function: Optional[str] = None) -> dict:
         """
-        THIS TOOL HELPS IN CREATING A TABLE WHICH STORES EMBEDDINGS.
-
+        This tool helps in creating a table which stores embeddings.
+        
         Creates a new vector store (table) with a predefined schema if it doesn't already exist.
         It first checks if the database exists, creating it if necessary.
         Then, it checks if the table exists; if so, it reports that.
@@ -75,7 +76,7 @@ class MariaDBServer:
                 db=DB_NAME,
                 minsize=1,
                 maxsize=MCP_MAX_POOL_SIZE,
-                autocommit=True,
+                autocommit=self.autocommit,
                 pool_recycle=3600
             )
             logger.info("Connection pool initialized successfully.")

@@ -61,8 +61,8 @@ EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "openai").lower()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # --- Validation ---
-if not all([DB_USER, DB_PASSWORD, DB_NAME]):
-    logger.error("Database credentials (DB_USER, DB_PASSWORD, DB_NAME) not found in environment variables or .env file.")
+if not all([DB_USER, DB_PASSWORD]):
+    logger.error("Database credentials (DB_USER, DB_PASSWORD) not found in environment variables or .env file.")
 
 # Embedding Provider and Keys
 logger.info(f"Selected Embedding Provider: {EMBEDDING_PROVIDER}")
