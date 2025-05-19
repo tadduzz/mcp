@@ -272,5 +272,5 @@ HF_MODEL="BAAI/bge-m3"
 ## Testing
 
 - Tests are located in the `tests/` directory.
-- See `tests/README.md` for an overview and `tests/test_mariadb_mcp_tools.py` for sample test cases.
+- See `tests/README.md` for an overview.
 - Tests cover both standard SQL and vector/embedding tool operations.
