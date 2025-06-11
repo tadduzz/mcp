@@ -1,6 +1,9 @@
 import unittest
 import anyio
+<<<<<<< Updated upstream
 import fastmcp
+=======
+>>>>>>> Stashed changes
 from fastmcp.client import Client
 from server import MariaDBServer
 import json
@@ -11,6 +14,7 @@ import json
 class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         # Start the MariaDBServer in the background using stdio transport
+<<<<<<< Updated upstream
         self.server = MariaDBServer(autocommit=False)
     
     async def task_group_helper(self, tg):
@@ -47,11 +51,49 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
                 self.assertIsInstance(result, list)
                 self.assertTrue(all(isinstance(table, str) for table in result))
             tg.cancel_scope.cancel()
+=======
+        self.server = MariaDBServer()
+        self.task_group = anyio.create_task_group()
+        await self.task_group.__aenter__()
+        # Start the server as a background task
+        self.task_group.start_soon(self.server.run_async_server, 'stdio')
+        # Give the server a moment to start up
+        await anyio.sleep(1)
+        # Connect the FastMCP client using stdio
+        self.client = Client(self.server.mcp)
+
+    async def asyncTearDown(self):
+        await anyio.sleep(1)
+        await self.task_group.__aexit__(None, None, None)
+        pass
+
+    async def test_list_databases(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('list_databases', {})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, list)
+            self.assertTrue(all(isinstance(db, str) for db in result))
+            # Optionally, check for system databases
+            for sys_db in ["information_schema", "mysql", "performance_schema", "sys"]:
+                self.assertIn(sys_db, result)
+    
+    async def test_list_tables_valid_db(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('list_tables', {'database_name': 'information_schema'})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, list)
+            self.assertTrue(all(isinstance(table, str) for table in result))
+>>>>>>> Stashed changes
             # Optionally, check for system tables
             for sys_table in ["ALL_PLUGINS", "APPLICABLE_ROLES"]:
                 self.assertIn(sys_table, result)
 
     async def test_get_schema_valid_table(self):
+<<<<<<< Updated upstream
         async with anyio.create_task_group() as tg:
             await self.task_group_helper(tg)
             async with self.client:
@@ -236,6 +278,85 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
                 except Exception as e:
                     pass
             tg.cancel_scope.cancel()
+=======
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('get_schema', {'database_name': 'information_schema', 'table_name': 'ALL_PLUGINS'})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(all(isinstance(value, str) for value in result.values()))
+
+    async def test_get_schema_invalid_table(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('get_schema', {'database_name': 'information_schema', 'table_name': 'INVALID_TABLE'})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(all(isinstance(value, str) for value in result.values()))
+            self.assertEqual(result['error'], 'Table not found')
+
+    async def test_execute_sql(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('execute_sql', {'sql_query': 'SELECT * FROM information_schema.tables'})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, list)
+            self.assertTrue(all(isinstance(table, dict) for table in result))
+            self.assertEqual(len(result), 1)
+
+    async def test_execute_sql_invalid_query(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('execute_sql', {'sql_query': 'SELECT * FROM information_schema.tables WHERE 1=1'})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(all(isinstance(value, str) for value in result.values()))
+            self.assertEqual(result['error'], 'Invalid query')
+
+    async def test_execute_sql_parameterized(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('execute_sql', {'sql_query': 'SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = %s', 'parameters': ['information_schema']})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, list)
+            self.assertTrue(all(isinstance(table, dict) for table in result))
+            self.assertEqual(len(result), 1)
+
+    async def test_execute_sql_parameterized_invalid(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('execute_sql', {'sql_query': 'SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = %s', 'parameters': ['information_schema']})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(all(isinstance(value, str) for value in result.values()))
+            self.assertEqual(result['error'], 'Invalid query')
+
+    async def test_execute_sql_parameterized_empty(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('execute_sql', {'sql_query': 'SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = %s', 'parameters': []})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(all(isinstance(value, str) for value in result.values()))
+            self.assertEqual(result['error'], 'Invalid query')
+
+    async def test_execute_sql_parameterized_mismatch(self):
+        # Call the tool via the client
+        async with self.client:
+            result = await self.client.call_tool('execute_sql', {'sql_query': 'SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = %s', 'parameters': ['information_schema', 'information_schema']})
+            result = result[0].text
+            result = json.loads(result)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(all(isinstance(value, str) for value in result.values()))
+            self.assertEqual(result['error'], 'Invalid query')
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+import unittest
+from unittest.mock import AsyncMock, patch
+import asyncio
+
+import sys
+import os
+
+# Import the MariaDBServer from the project
+from server import MariaDBServer
+
 """
 Manual Test Cases for MariaDB Ops Server MCP Tools via Cascade AI Assistant
 
@@ -22,15 +32,36 @@ directly to run the tests as it relies on Cascade's MCP tool interaction.
 # The following functions represent the test steps performed manually.
 # Expected outcomes are based on the interactive session results.
 
-def test_step_1_list_databases():
-    """
-    Test: Call mcp0_list_databases.
-    Purpose: Verify it returns a list of database names.
-    Expected Outcome: Success, returns a JSON list of strings (database names).
-    Result: PASSED (Observed list: ['chinook', 'information_schema', ...])
-    """
-    print("Executing: mcp0_list_databases()")
-    # Manual execution via Cascade passed.
+def setup_mcp():
+    server = MariaDBServer()
+    asyncio.run(server.initialize_pool())
+    return server
+
+class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
+    async def setUp(self):
+        server = MariaDBServer()
+        self.server = server
+        await server.initialize_pool()
+        server.register_tools()
+
+    def tearDown(self):
+        self.server.close_pool()
+
+    async def test_step_1_list_databases(self):
+        """
+        Test: Call mcp0_list_databases.
+        Purpose: Verify it returns a list of database names.
+        Expected Outcome: Success, returns a JSON list of strings (database names).
+        """
+        result = await self.server.list_databases()
+        self.assertIsInstance(result, list)
+        self.assertTrue(all(isinstance(db, str) for db in result))
+        for sys_db in ["mysql", "sys"]:
+            self.assertIn(sys_db, result)
+
+# If this file is run directly, run the tests
+if __name__ == "__main__":
+    unittest.main()
 
 def test_step_2_list_tables_valid_db():
     """
