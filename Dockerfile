@@ -21,4 +21,4 @@ RUN uv sync
 
 EXPOSE 9001
 
-CMD ["uv", "run", "server.py", "--transport", "sse"]
+CMD ["uv", "run", "src/server.py", "--host", "0.0.0.0", "--transport", "sse"]
