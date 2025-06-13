@@ -25,7 +25,7 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
 - Retrieving table schemas
 - Executing safe, read-only SQL queries
 - Creating and managing vector stores for embedding-based search
-- Integrating with embedding providers (currently OpenAI)
+- Integrating with embedding providers (currently OpenAI, Gemini, and HuggingFace)
 
 ---
 
