@@ -25,7 +25,7 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
 - Retrieving table schemas
 - Executing safe, read-only SQL queries
 - Creating and managing vector stores for embedding-based search
-- Integrating with embedding providers (currently OpenAI, Gemini, and HuggingFace)
+- Integrating with embedding providers (currently OpenAI, Gemini, and HuggingFace) (optional)
 
 ---
 
@@ -63,7 +63,9 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
   - Creates a new database if it doesn't exist.
   - Parameters: `database_name` (string, required)  
 
-### Vector Store & Embedding Tools
+### Vector Store & Embedding Tools (optional)
+
+**Note**: These tools are only available when `EMBEDDING_PROVIDER` is configured. If no embedding provider is set, these tools will be disabled.
 
 - **create_vector_store**
   - Creates a new vector store (table) for embeddings.
@@ -89,6 +91,10 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
 
 ## Embeddings & Vector Store
 
+### Overview
+
+The MCP MariaDB Server provides **optional** embedding and vector store capabilities. These features can be enabled by configuring an embedding provider, or completely disabled if you only need standard database operations.
+
 ### Supported Providers
 
 - **OpenAI**
@@ -97,11 +103,10 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
 
 ### Configuration
 
-- `EMBEDDING_PROVIDER`: Set to `openai` (default option), can change it to required providers
+- `EMBEDDING_PROVIDER`: Set to `openai`, `gemini`, `huggingface`, or leave unset to disable
 - `OPENAI_API_KEY`: Required if using OpenAI embeddings
-- GEMINI_API_KEY`: Required if using Gemini embeddings
-- Open models from HUGGINGFACE: Required open model currently provided option for "intfloat/multilingual-e5-large-instruct" & "BAAI/bge-m3"
-
+- `GEMINI_API_KEY`: Required if using Gemini embeddings
+- `HF_MODEL`: Required if using HuggingFace embeddings (e.g., "intfloat/multilingual-e5-large-instruct" or "BAAI/bge-m3")
 ### Model Selection
 
 - Default and allowed models are configurable in code (`DEFAULT_OPENAI_MODEL`, `ALLOWED_OPENAI_MODELS`)
@@ -130,13 +135,14 @@ All configuration is via environment variables (typically set in a `.env` file):
 | `DB_NAME`              | Default database (optional; can be set per query)      | No       |              |
 | `MCP_READ_ONLY`        | Enforce read-only SQL mode (`true`/`false`)            | No       | `true`       |
 | `MCP_MAX_POOL_SIZE`    | Max DB connection pool size                            | No       | `10`         |
-| `EMBEDDING_PROVIDER`   | Embedding provider (`openai`/`gemini`/`huggingface`)   | No       | `openai`     |
-| `OPENAI_API_KEY`       | API key for OpenAI embeddings                          | Yes (if using embeddings) | |
-| `GEMINII_API_KEY`      | API key for Gemini embeddings                          | Yes (if using embeddings) | |
-| `HF_MODEL`             | Open models from Huggingface                           | Yes (if using embeddings) | |
+| `EMBEDDING_PROVIDER`   | Embedding provider (`openai`/`gemini`/`huggingface`)   | No     |`None`(Disabled)|
+| `OPENAI_API_KEY`       | API key for OpenAI embeddings                          | Yes (if EMBEDDING_PROVIDER=openai) | |
+| `GEMINI_API_KEY`       | API key for Gemini embeddings                          | Yes (if EMBEDDING_PROVIDER=gemini) | |
+| `HF_MODEL`             | Open models from Huggingface                           | Yes (if EMBEDDING_PROVIDER=huggingface) | |
 
 #### Example `.env` file
 
+**With Embedding Support (OpenAI):**
 ```dotenv
 DB_HOST=localhost
 DB_USER=your_db_user
@@ -151,6 +157,17 @@ EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=sk-...
 GEMINI_API_KEY=AI...
 HF_MODEL="BAAI/bge-m3"
+```
+
+**Without Embedding Support:**
+```dotenv
+DB_HOST=localhost
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_PORT=3306
+DB_NAME=your_default_database
+MCP_READ_ONLY=true
+MCP_MAX_POOL_SIZE=10
 ```
 
 ---
@@ -244,9 +261,9 @@ HF_MODEL="BAAI/bge-m3"
 ```
 ---
 
-## Integration - Claude desktop/Cursor/Windsurf
+## Integration - Claude desktop/Cursor/Windsurf/VSCode
 
-```python
+```json
 {
   "mcpServers": {
     "MariaDB_Server": {
@@ -258,6 +275,18 @@ HF_MODEL="BAAI/bge-m3"
         "server.py"
         ],
         "envFile": "path/to/mcp-server-mariadb-vector/.env"      
+    }
+  }
+}
+```
+or
+**If already running MCP server**
+```json
+{
+  "servers": {
+    "mariadb-mcp-server": {
+      "url": "http://{host}:9001/sse",
+      "type": "sse"
     }
   }
 }

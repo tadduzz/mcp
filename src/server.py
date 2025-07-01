@@ -12,14 +12,17 @@ from fastmcp import FastMCP, Context
 # Import configuration settings
 from config import (
     DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME,
-    MCP_READ_ONLY, MCP_MAX_POOL_SIZE, logger
+    MCP_READ_ONLY, MCP_MAX_POOL_SIZE, EMBEDDING_PROVIDER,
+    logger
 )
 
 # Import EmbeddingService for vector store creation
 from embeddings import EmbeddingService
 
 # Singleton instance for embedding service
-embedding_service = EmbeddingService()
+embedding_service = None
+if EMBEDDING_PROVIDER is not None:
+    embedding_service = EmbeddingService()
 
 from asyncmy.errors import Error as AsyncMyError
 
@@ -698,11 +701,12 @@ class MariaDBServer:
         self.mcp.add_tool(self.get_table_schema)
         self.mcp.add_tool(self.execute_sql)
         self.mcp.add_tool(self.create_database)
-        self.mcp.add_tool(self.create_vector_store)
-        self.mcp.add_tool(self.list_vector_stores)
-        self.mcp.add_tool(self.delete_vector_store)
-        self.mcp.add_tool(self.insert_docs_vector_store)
-        self.mcp.add_tool(self.search_vector_store)
+        if EMBEDDING_PROVIDER is not None:
+            self.mcp.add_tool(self.create_vector_store)
+            self.mcp.add_tool(self.list_vector_stores)
+            self.mcp.add_tool(self.delete_vector_store)
+            self.mcp.add_tool(self.insert_docs_vector_store)
+            self.mcp.add_tool(self.search_vector_store)
         logger.info("Registered MCP tools explicitly.")
 
     # --- Async Main Server Logic ---

@@ -59,7 +59,8 @@ MCP_MAX_POOL_SIZE = int(os.getenv("MCP_MAX_POOL_SIZE", 10))
 
 # --- Embedding Configuration ---
 # Provider selection ('openai' or 'gemini' or 'huggingface')
-EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "openai").lower()
+EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER")
+EMBEDDING_PROVIDER = EMBEDDING_PROVIDER.lower() if EMBEDDING_PROVIDER else None
 # API Keys
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -86,8 +87,8 @@ elif EMBEDDING_PROVIDER == "huggingface":
         logger.error("EMBEDDING_PROVIDER is 'huggingface' but HF_MODEL is missing.")
         raise ValueError("HuggingFace model is required when EMBEDDING_PROVIDER is 'huggingface'.")
 else:
-    logger.error(f"Invalid EMBEDDING_PROVIDER specified: '{EMBEDDING_PROVIDER}'. Use 'openai' or 'gemini' or 'huggingface'.")
-    raise ValueError(f"Invalid EMBEDDING_PROVIDER: '{EMBEDDING_PROVIDER}'.")
+    EMBEDDING_PROVIDER = None
+    logger.info(f"No EMBEDDING_PROVIDER selected or it is set to None. Disabling embedding features.")
 
 logger.info(f"Read-only mode: {MCP_READ_ONLY}")
 logger.info(f"Logging to console and to file: {LOG_FILE_PATH} (Level: {LOG_LEVEL}, MaxSize: {LOG_MAX_BYTES}B, Backups: {LOG_BACKUP_COUNT})")
