@@ -54,6 +54,10 @@ The MCP MariaDB Server exposes a set of tools for interacting with MariaDB datab
   - Retrieves schema for a table (columns, types, keys, etc.).
   - Parameters: `database_name` (string, required), `table_name` (string, required)
 
+- **get_table_schema_with_relations**
+  - Retrieves schema with foreign key relations for a table.
+  - Parameters: `database_name` (string, required), `table_name` (string, required)
+
 - **execute_sql**
   - Executes a read-only SQL query (`SELECT`, `SHOW`, `DESCRIBE`).
   - Parameters: `sql_query` (string, required), `database_name` (string, optional), `parameters` (list, optional)
