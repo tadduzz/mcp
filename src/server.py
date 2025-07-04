@@ -311,6 +311,76 @@ class MariaDBServer:
         except Exception as e:
             logger.error(f"TOOL ERROR: get_table_schema failed for database_name={database_name}, table_name={table_name}: {e}", exc_info=True)
             raise RuntimeError(f"Could not retrieve schema for table '{database_name}.{table_name}'.")
+        
+    async def get_table_schema_with_relations(self, database_name: str, table_name: str) -> Dict[str, Any]:
+        """
+        Retrieves table schema with foreign key relationship information.
+        Includes all basic schema info plus foreign key relationships and referenced tables.
+        """
+        logger.info(f"TOOL START: get_table_schema_with_relations called. database_name={database_name}, table_name={table_name}")
+        if not database_name or not database_name.isidentifier():
+            logger.warning(f"TOOL WARNING: get_table_schema_with_relations called with invalid database_name: {database_name}")
+            raise ValueError(f"Invalid database name provided: {database_name}")
+        if not table_name or not table_name.isidentifier():
+            logger.warning(f"TOOL WARNING: get_table_schema_with_relations called with invalid table_name: {table_name}")
+            raise ValueError(f"Invalid table name provided: {table_name}")
+
+        try:
+            # 1. Get basic schema information
+            basic_schema = await self.get_table_schema(database_name, table_name)
+            
+            # 2. Retrieve foreign key information
+            fk_sql = """
+            SELECT 
+                kcu.COLUMN_NAME as column_name,
+                kcu.CONSTRAINT_NAME as constraint_name,
+                kcu.REFERENCED_TABLE_NAME as referenced_table,
+                kcu.REFERENCED_COLUMN_NAME as referenced_column,
+                rc.UPDATE_RULE as on_update,
+                rc.DELETE_RULE as on_delete
+            FROM information_schema.KEY_COLUMN_USAGE kcu
+            INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
+                ON kcu.CONSTRAINT_NAME = rc.CONSTRAINT_NAME
+                AND kcu.CONSTRAINT_SCHEMA = rc.CONSTRAINT_SCHEMA
+            WHERE kcu.TABLE_SCHEMA = %s 
+              AND kcu.TABLE_NAME = %s 
+              AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
+            ORDER BY kcu.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
+            """
+            
+            fk_results = await self._execute_query(fk_sql, params=(database_name, table_name))
+            
+            # 3. Add foreign key information to the basic schema
+            enhanced_schema = {}
+            for col_name, col_info in basic_schema.items():
+                enhanced_schema[col_name] = col_info.copy()
+                enhanced_schema[col_name]['foreign_key'] = None
+            
+            # 4. Add foreign key information to the corresponding columns
+            for fk_row in fk_results:
+                column_name = fk_row['column_name']
+                if column_name in enhanced_schema:
+                    enhanced_schema[column_name]['foreign_key'] = {
+                        'constraint_name': fk_row['constraint_name'],
+                        'referenced_table': fk_row['referenced_table'],
+                        'referenced_column': fk_row['referenced_column'],
+                        'on_update': fk_row['on_update'],
+                        'on_delete': fk_row['on_delete']
+                    }
+            
+            # 5. Return the enhanced schema with foreign key relations
+            result = {
+                'table_name': table_name,
+                'columns': enhanced_schema
+            }
+            
+            logger.info(f"TOOL END: get_table_schema_with_relations completed. Columns: {len(enhanced_schema)}, Foreign keys: {len(fk_results)}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"TOOL ERROR: get_table_schema_with_relations failed for database_name={database_name}, table_name={table_name}: {e}", exc_info=True)
+            raise RuntimeError(f"Could not retrieve schema with relations for table '{database_name}.{table_name}': {str(e)}")
+
 
     async def execute_sql(self, sql_query: str, database_name: str, parameters: Optional[List[Any]] = None) -> List[Dict[str, Any]]:
         """
@@ -699,6 +769,7 @@ class MariaDBServer:
         self.mcp.add_tool(self.list_databases)
         self.mcp.add_tool(self.list_tables)
         self.mcp.add_tool(self.get_table_schema)
+        self.mcp.add_tool(self.get_table_schema_with_relations)
         self.mcp.add_tool(self.execute_sql)
         self.mcp.add_tool(self.create_database)
         if EMBEDDING_PROVIDER is not None:
