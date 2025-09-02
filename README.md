@@ -201,10 +201,27 @@ MCP_MAX_POOL_SIZE=10
    ```
 4. **Create `.env`** in the project root (see [Configuration](#configuration--environment-variables))
 5. **Run the server**
+   
+   **Standard Input/Output (default):**
    ```bash
    python server.py
    ```
-   _Adjust entry point if needed (e.g., `main.py`)_
+   
+   **SSE Transport:**
+   ```bash
+   python server.py --transport sse --host 127.0.0.1 --port 9001
+   ```
+   
+   **HTTP Transport (streamable HTTP):**
+   ```bash
+   python server.py --transport http --host 127.0.0.1 --port 9001 --path /mcp
+   ```
+   
+   **HTTPS Transport (with SSL certificates):**
+   ```bash
+   python server.py --transport http --host 127.0.0.1 --port 9001 --path /mcp \
+     --ssl-keyfile /path/to/key.pem --ssl-certfile /path/to/cert.pem
+   ```
 
 ---
 
@@ -268,6 +285,7 @@ MCP_MAX_POOL_SIZE=10
 
 ## Integration - Claude desktop/Cursor/Windsurf/VSCode
 
+### Option 1: Direct Command (stdio)
 ```json
 {
   "mcpServers": {
@@ -284,14 +302,38 @@ MCP_MAX_POOL_SIZE=10
   }
 }
 ```
-or
-**If already running MCP server**
+
+### Option 2: SSE Transport
 ```json
 {
   "servers": {
     "mariadb-mcp-server": {
-      "url": "http://{host}:9001/sse",
+      "url": "http://{host}:9001",
       "type": "sse"
+    }
+  }
+}
+```
+
+### Option 3: HTTP Transport (Recommended for production)
+```json
+{
+  "servers": {
+    "mariadb-mcp-server": {
+      "url": "http://{host}:9001/mcp",
+      "type": "streamable-http"
+    }
+  }
+}
+```
+
+### Option 4: HTTPS Transport (Secure)
+```json
+{
+  "servers": {
+    "mariadb-mcp-server": {
+      "url": "https://{host}:9001/mcp",
+      "type": "streamable-http"
     }
   }
 }
