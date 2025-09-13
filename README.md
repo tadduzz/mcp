@@ -145,6 +145,8 @@ All configuration is via environment variables (typically set in a `.env` file):
 | `GEMINI_API_KEY`       | API key for Gemini embeddings                          | Yes (if EMBEDDING_PROVIDER=gemini) | |
 | `HF_MODEL`             | Open models from Huggingface                           | Yes (if EMBEDDING_PROVIDER=huggingface) | |
 
+Note that if using 'http' or 'sse' as the transport, configuring authentication is important for security. Because different organizations use different authentication methods, the server does not provide a default authentication method. You will need to configure your own authentication method. Thankfully FastMCP provides a simple way to do this starting with version 2.12.1. See the [FastMCP documentation](https://gofastmcp.com/servers/auth/authentication#environment-configuration) for more information. We have provided an example configuration below.
+
 #### Example `.env` file
 
 **With Embedding Support (OpenAI):**
@@ -173,6 +175,21 @@ DB_PORT=3306
 DB_NAME=your_default_database
 MCP_READ_ONLY=true
 MCP_MAX_POOL_SIZE=10
+```
+
+**Example Authentication Configuration:**
+This configuration uses external web authentication via GitHub or Google. Please only use one of these authentication providers. If you have internal JWT authentication (desired for organizations who manage their own services), you can use the JWT provider instead.
+
+```dotenv
+# GitHub OAuth
+export FASTMCP_SERVER_AUTH=fastmcp.server.auth.providers.github.GitHubProvider
+export FASTMCP_SERVER_AUTH_GITHUB_CLIENT_ID="Ov23li..."
+export FASTMCP_SERVER_AUTH_GITHUB_CLIENT_SECRET="github_pat_..."
+
+# Google OAuth
+export FASTMCP_SERVER_AUTH=fastmcp.server.auth.providers.google.GoogleProvider
+export FASTMCP_SERVER_AUTH_GOOGLE_CLIENT_ID="123456.apps.googleusercontent.com"
+export FASTMCP_SERVER_AUTH_GOOGLE_CLIENT_SECRET="GOCSPX-..."
 ```
 
 ---

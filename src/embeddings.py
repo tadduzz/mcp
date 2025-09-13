@@ -106,8 +106,7 @@ class EmbeddingService:
                 raise ValueError("Gemini API key is required for the Gemini provider.")
             try:
                 import google.genai as genai
-                genai.configure(api_key=GEMINI_API_KEY) # Ensure API key is configured
-                self.gemini_client = genai # Keeping self.gemini_client = genai based on previous structure for embed_content
+                self.gemini_client = genai.Client(api_key=GEMINI_API_KEY) # Keeping self.gemini_client = genai based on previous structure for embed_content
                 self.allowed_models = ALLOWED_GEMINI_MODELS
                 self.default_model = DEFAULT_GEMINI_MODEL
                 logger.info(f"Gemini client initialized. Default model: {self.default_model}. Allowed: {self.allowed_models}")
