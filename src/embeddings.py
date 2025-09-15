@@ -106,7 +106,9 @@ class EmbeddingService:
                 raise ValueError("Gemini API key is required for the Gemini provider.")
             try:
                 import google.genai as genai
+                from google.genai import types as genai_types
                 self.gemini_client = genai.Client(api_key=GEMINI_API_KEY) # Keeping self.gemini_client = genai based on previous structure for embed_content
+                self.gemini_config = genai_types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT")
                 self.allowed_models = ALLOWED_GEMINI_MODELS
                 self.default_model = DEFAULT_GEMINI_MODEL
                 logger.info(f"Gemini client initialized. Default model: {self.default_model}. Allowed: {self.allowed_models}")
@@ -278,23 +280,23 @@ class EmbeddingService:
                 embeddings = []
                 for t in texts:
                     embedding_result = await asyncio.to_thread(
-                        genai.embed_content, # Changed from self.gemini_client.models.embed_content
+                        self.gemini_client.models.embed_content,
                         model=f'models/{target_model}', # Gemini models often need 'models/' prefix
-                        content=t,
-                        task_type="RETRIEVAL_DOCUMENT" # Or other relevant task_type
+                        contents=t,
+                        config=self.gemini_config
                     )
-                    # The structure of embedding_result might vary. Common is embedding_result['embedding']
-                    # Based on previous structure: embedding_result.embeddings[0].values
-                    # Let's assume embedding_result directly contains the list of floats or has a clear path
-                    # For 'text-embedding-004', it's usually result['embedding'] which is a list of floats.
-                    if isinstance(embedding_result, dict) and 'embedding' in embedding_result:
+                    # For the newer Gemini API, the embedding should be directly accessible
+                    # through the embedding attribute of the response
+                    if hasattr(embedding_result, 'embedding') and isinstance(embedding_result.embedding, list):
+                        embeddings.append(embedding_result.embedding)
+                    # Fallback for other response structures
+                    elif isinstance(embedding_result, dict) and 'embedding' in embedding_result:
                         embeddings.append(embedding_result['embedding'])
-                    elif hasattr(embedding_result, 'embedding') and isinstance(embedding_result.embedding, list): # For some client versions
-                         embeddings.append(embedding_result.embedding)
-                    elif hasattr(embedding_result, 'embeddings') and embedding_result.embeddings and hasattr(embedding_result.embeddings[0], 'values'): # Original assumption
+                    elif hasattr(embedding_result, 'embeddings') and embedding_result.embeddings and hasattr(embedding_result.embeddings[0], 'values'):
                         embeddings.append(embedding_result.embeddings[0].values)
                     else:
-                        logger.error(f"Unexpected Gemini embedding result structure: {embedding_result}")
+                        logger.error(f"Unexpected Gemini embedding result structure: {type(embedding_result).__name__}")
+                        logger.error(f"Available attributes: {dir(embedding_result) if hasattr(embedding_result, '__dir__') else 'Not inspectable'}")
                         raise RuntimeError("Failed to parse Gemini embedding result.")
             
                 logger.debug(f"Gemini embedding(s) received. Count: {len(embeddings)}, Dimension: {len(embeddings[0]) if embeddings else 'N/A'}")
