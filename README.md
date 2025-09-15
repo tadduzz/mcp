@@ -211,10 +211,8 @@ export FASTMCP_SERVER_AUTH_GOOGLE_CLIENT_SECRET="GOCSPX-..."
    ```
 3. **Install dependencies**
    ```bash
-   uv pip compile pyproject.toml -o uv.lock
-   ```
-   ```bash
-   uv pip sync uv.lock
+   uv lock
+   uv sync
    ```
 4. **Create `.env`** in the project root (see [Configuration](#configuration--environment-variables))
 5. **Run the server**
