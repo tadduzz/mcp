@@ -28,7 +28,7 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
             await self.task_group_helper(tg)
             async with self.client:
                 result = await self.client.call_tool('list_databases', {})
-                result = result[0].text
+                result = result.text
                 result = json.loads(result)
                 self.assertIsInstance(result, list)
                 self.assertTrue(all(isinstance(db, str) for db in result))
@@ -42,7 +42,7 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
             await self.task_group_helper(tg)
             async with self.client:
                 result = await self.client.call_tool('list_tables', {'database_name': 'information_schema'})
-                result = result[0].text
+                result = result.text
                 result = json.loads(result)
                 self.assertIsInstance(result, list)
                 self.assertTrue(all(isinstance(table, str) for table in result))
@@ -56,7 +56,7 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
             await self.task_group_helper(tg)
             async with self.client:
                 result = await self.client.call_tool('get_table_schema', {'database_name': 'information_schema', 'table_name': 'ALL_PLUGINS'})
-                result = result[0].text
+                result = result.text
                 result = json.loads(result)
                 self.assertIsInstance(result, dict)
                 print(result)
@@ -80,7 +80,7 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
             await self.task_group_helper(tg)
             async with self.client:
                 result = await self.client.call_tool('execute_sql', {'database_name': 'information_schema', 'sql_query': 'SELECT 1'})
-                result = result[0].text
+                result = result.text
                 result = json.loads(result)
                 self.assertIsInstance(result, list)
                 self.assertEqual(result[0]['1'], 1)
@@ -104,7 +104,7 @@ class TestMariaDBMCPTools(unittest.IsolatedAsyncioTestCase):
             await self.task_group_helper(tg)
             async with self.client:
                 result = await self.client.call_tool('execute_sql', {'database_name': 'information_schema', 'sql_query': 'SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = %s', 'parameters': ['information_schema']})
-                result = result[0].text
+                result = result.text
                 result = json.loads(result)
                 self.assertIsInstance(result, list)
             self.assertTrue(all(isinstance(table, dict) for table in result))

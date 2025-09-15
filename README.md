@@ -144,8 +144,10 @@ All configuration is via environment variables (typically set in a `.env` file):
 | `OPENAI_API_KEY`       | API key for OpenAI embeddings                          | Yes (if EMBEDDING_PROVIDER=openai) | |
 | `GEMINI_API_KEY`       | API key for Gemini embeddings                          | Yes (if EMBEDDING_PROVIDER=gemini) | |
 | `HF_MODEL`             | Open models from Huggingface                           | Yes (if EMBEDDING_PROVIDER=huggingface) | |
+| `ALLOWED_ORIGINS`      | Comma-separated list of allowed origins                | No       | Long list of allowed origins corresponding to local use of the server |
+| `ALLOWED_HOSTS`        | Comma-separated list of allowed hosts                  | No       | `localhost,127.0.0.1` |
 
-Note that if using 'http' or 'sse' as the transport, configuring authentication is important for security. Because different organizations use different authentication methods, the server does not provide a default authentication method. You will need to configure your own authentication method. Thankfully FastMCP provides a simple way to do this starting with version 2.12.1. See the [FastMCP documentation](https://gofastmcp.com/servers/auth/authentication#environment-configuration) for more information. We have provided an example configuration below.
+Note that if using 'http' or 'sse' as the transport, configuring authentication is important for security if you allow connections outside of localhost. Because different organizations use different authentication methods, the server does not provide a default authentication method. You will need to configure your own authentication method. Thankfully FastMCP provides a simple way to do this starting with version 2.12.1. See the [FastMCP documentation](https://gofastmcp.com/servers/auth/authentication#environment-configuration) for more information. We have provided an example configuration below.
 
 #### Example `.env` file
 
@@ -178,7 +180,7 @@ MCP_MAX_POOL_SIZE=10
 ```
 
 **Example Authentication Configuration:**
-This configuration uses external web authentication via GitHub or Google. Please only use one of these authentication providers. If you have internal JWT authentication (desired for organizations who manage their own services), you can use the JWT provider instead.
+This configuration uses external web authentication via GitHub or Google. If you have internal JWT authentication (desired for organizations who manage their own services), you can use the JWT provider instead.
 
 ```dotenv
 # GitHub OAuth
@@ -219,17 +221,17 @@ export FASTMCP_SERVER_AUTH_GOOGLE_CLIENT_SECRET="GOCSPX-..."
    
    **Standard Input/Output (default):**
    ```bash
-   python server.py
+   uv run server.py
    ```
    
    **SSE Transport:**
    ```bash
-   python server.py --transport sse --host 127.0.0.1 --port 9001
+   uv run server.py --transport sse --host 127.0.0.1 --port 9001
    ```
    
    **HTTP Transport (streamable HTTP):**
    ```bash
-   python server.py --transport http --host 127.0.0.1 --port 9001 --path /mcp
+   uv run server.py --transport http --host 127.0.0.1 --port 9001 --path /mcp
    ```
 
 ---

@@ -1,6 +1,14 @@
 # server.py
+
+# Import configuration settings
+from config import (
+    DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_CHARSET,
+    MCP_READ_ONLY, MCP_MAX_POOL_SIZE, EMBEDDING_PROVIDER,
+    ALLOWED_ORIGINS, ALLOWED_HOSTS,
+    logger
+)
+
 import asyncio
-import logging
 import argparse
 import re
 from typing import List, Dict, Any, Optional
@@ -10,12 +18,9 @@ import asyncmy
 import anyio 
 from fastmcp import FastMCP, Context
 
-# Import configuration settings
-from config import (
-    DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_CHARSET,
-    MCP_READ_ONLY, MCP_MAX_POOL_SIZE, EMBEDDING_PROVIDER,
-    logger
-)
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 # Import EmbeddingService for vector store creation
 from embeddings import EmbeddingService
@@ -36,7 +41,7 @@ class MariaDBServer:
     def __init__(self, server_name="MariaDB_Server", autocommit=True):
         self.mcp = FastMCP(server_name)
         self.pool: Optional[asyncmy.Pool] = None
-        self.autocommit=autocommit
+        self.autocommit = not MCP_READ_ONLY
         self.is_read_only = MCP_READ_ONLY
         logger.info(f"Initializing {server_name}...")
         if self.is_read_only:
@@ -855,11 +860,22 @@ class MariaDBServer:
 
             # 3. Prepare transport arguments
             transport_kwargs = {}
+            if transport != "stdio":
+                middleware = [
+                    Middleware(
+                        CORSMiddleware,
+                        allow_origins=ALLOWED_ORIGINS,
+                        allow_methods=["GET", "POST"],
+                        allow_headers=["*"],
+                    ),
+                    Middleware(TrustedHostMiddleware, 
+                               allowed_hosts=ALLOWED_HOSTS)
+                ]
             if transport == "sse":
-                transport_kwargs = {"host": host, "port": port}
+                transport_kwargs = {"host": host, "port": port, "middleware": middleware}
                 logger.info(f"Starting MCP server via {transport} on {host}:{port}...")
             elif transport == "http":
-                transport_kwargs = {"host": host, "port": port, "path": path}
+                transport_kwargs = {"host": host, "port": port, "path": path, "middleware": middleware}
                 logger.info(f"Starting MCP server via {transport} on {host}:{port}{path}...")
             elif transport == "stdio":
                  logger.info(f"Starting MCP server via {transport}...")
