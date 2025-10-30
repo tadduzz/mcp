@@ -16,7 +16,7 @@ from config import (
 
 # Import specific client libraries
 try:
-    from openai import AsyncOpenAI, OpenAIError
+    from api_openai import AsyncOpenAI, OpenAIError
 except ImportError:
     logger.warning("OpenAI library not installed. OpenAI provider will not be available.")
     AsyncOpenAI = None # type: ignore
